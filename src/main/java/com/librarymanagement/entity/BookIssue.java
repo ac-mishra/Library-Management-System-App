@@ -117,5 +117,15 @@ public class BookIssue {
     public void setUpdatedAt(LocalDateTime updatedAt) {
         this.updatedAt = updatedAt;
     }
+    @Override
+    public String toString() {
+
+        if (book != null && book.getTitle() != null) {
+            return issueId + " - " + book.getTitle();
+        }
+
+        return "Issue #" + issueId;
+
+    }
 
 }

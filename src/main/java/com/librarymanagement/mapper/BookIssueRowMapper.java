@@ -13,7 +13,7 @@ import java.sql.Timestamp;
  * Row Mapper for Book Issue.
  *
  * @author Amrit Chandan Mishra
- * @version 1.0.0
+ * @version 2.0.0
  */
 public final class BookIssueRowMapper {
 
@@ -29,13 +29,39 @@ public final class BookIssueRowMapper {
                 resultSet.getInt("issue_id")
         );
 
+        //==========================
+        // Book
+        //==========================
+
         Book book = new Book();
 
         book.setBookId(
                 resultSet.getInt("book_id")
         );
 
+        try {
+
+            book.setTitle(
+                    resultSet.getString("title")
+            );
+
+        } catch (SQLException ignored) {
+        }
+
+        try {
+
+            book.setIsbn(
+                    resultSet.getString("isbn")
+            );
+
+        } catch (SQLException ignored) {
+        }
+
         issue.setBook(book);
+
+        //==========================
+        // Member
+        //==========================
 
         Member member = new Member();
 
@@ -43,7 +69,29 @@ public final class BookIssueRowMapper {
                 resultSet.getInt("member_id")
         );
 
+        try {
+
+            member.setFirstName(
+                    resultSet.getString("first_name")
+            );
+
+        } catch (SQLException ignored) {
+        }
+
+        try {
+
+            member.setLastName(
+                    resultSet.getString("last_name")
+            );
+
+        } catch (SQLException ignored) {
+        }
+
         issue.setMember(member);
+
+        //==========================
+        // User
+        //==========================
 
         User user = new User();
 
@@ -52,6 +100,10 @@ public final class BookIssueRowMapper {
         );
 
         issue.setIssuedBy(user);
+
+        //==========================
+        // Dates
+        //==========================
 
         if (resultSet.getDate("issue_date") != null) {
 
@@ -80,6 +132,10 @@ public final class BookIssueRowMapper {
 
         }
 
+        //==========================
+        // Fine & Status
+        //==========================
+
         issue.setFineAmount(
                 resultSet.getDouble("fine_amount")
         );
@@ -87,6 +143,10 @@ public final class BookIssueRowMapper {
         issue.setStatus(
                 resultSet.getString("status")
         );
+
+        //==========================
+        // Audit
+        //==========================
 
         Timestamp created =
                 resultSet.getTimestamp("created_at");

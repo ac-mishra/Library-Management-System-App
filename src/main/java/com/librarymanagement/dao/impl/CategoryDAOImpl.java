@@ -142,21 +142,97 @@ public class CategoryDAOImpl
     @Override
     public Category save(Category category) {
 
-        throw new UnsupportedOperationException();
+        try (
+
+                Connection connection =
+                        DBConnection.getConnection();
+
+                PreparedStatement ps =
+                        connection.prepareStatement(
+                                CategoryQueries.INSERT,
+                                PreparedStatement.RETURN_GENERATED_KEYS
+                        )
+
+        ) {
+
+            ps.setString(1, category.getCategoryName());
+            ps.setString(2, category.getDescription());
+
+            ps.executeUpdate();
+
+            try (ResultSet rs = ps.getGeneratedKeys()) {
+
+                if (rs.next()) {
+
+                    category.setCategoryId(rs.getInt(1));
+
+                }
+
+            }
+
+            return category;
+
+        } catch (SQLException e) {
+
+            throw new RuntimeException(e);
+
+        }
 
     }
 
     @Override
     public boolean update(Category category) {
 
-        throw new UnsupportedOperationException();
+        try (
+
+                Connection connection =
+                        DBConnection.getConnection();
+
+                PreparedStatement ps =
+                        connection.prepareStatement(
+                                CategoryQueries.UPDATE
+                        )
+
+        ) {
+
+            ps.setString(1, category.getCategoryName());
+            ps.setString(2, category.getDescription());
+            ps.setInt(3, category.getCategoryId());
+
+            return ps.executeUpdate() > 0;
+
+        } catch (SQLException e) {
+
+            throw new RuntimeException(e);
+
+        }
 
     }
 
     @Override
     public boolean delete(Integer id) {
 
-        throw new UnsupportedOperationException();
+        try (
+
+                Connection connection =
+                        DBConnection.getConnection();
+
+                PreparedStatement ps =
+                        connection.prepareStatement(
+                                CategoryQueries.DELETE
+                        )
+
+        ) {
+
+            ps.setInt(1, id);
+
+            return ps.executeUpdate() > 0;
+
+        } catch (SQLException e) {
+
+            throw new RuntimeException(e);
+
+        }
 
     }
 }

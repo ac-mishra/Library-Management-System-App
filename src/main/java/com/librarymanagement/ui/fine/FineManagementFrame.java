@@ -1,32 +1,29 @@
-package com.librarymanagement.ui.issue;
+package com.librarymanagement.ui.fine;
 
-import com.librarymanagement.entity.Book;
-import com.librarymanagement.entity.Member;
 import com.librarymanagement.entity.BookIssue;
-import com.librarymanagement.entity.User;
 import com.librarymanagement.service.BookIssueService;
-import com.librarymanagement.service.BookService;
-import com.librarymanagement.service.MemberService;
 import com.librarymanagement.service.impl.BookIssueServiceImpl;
-import com.librarymanagement.service.impl.BookServiceImpl;
-import com.librarymanagement.service.impl.MemberServiceImpl;
-import com.toedter.calendar.JDateChooser;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.LineBorder;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
-import java.time.ZoneId;
 import java.util.Optional;
 
-public class IssueBookFrame extends JFrame {
+public class FineManagementFrame extends JFrame {
 
-    private static final Color PRIMARY = new Color(25,118,210);
-    private static final Color SUCCESS = new Color(46,125,50);
-    private static final Color DANGER = new Color(198,40,40);
-    private static final Color GRAY = new Color(97,97,97);
-    private static final Color BG = new Color(245,247,250);
+    private static final Color PRIMARY =
+            new Color(25,118,210);
+
+    private static final Color SUCCESS =
+            new Color(46,125,50);
+
+    private static final Color DANGER =
+            new Color(211,47,47);
+
+    private static final Color LIGHT =
+            new Color(245,247,250);
 
     private static final Font TITLE_FONT =
             new Font("Segoe UI",Font.BOLD,28);
@@ -38,28 +35,35 @@ public class IssueBookFrame extends JFrame {
             new Font("Segoe UI",Font.PLAIN,14);
 
     private JPanel rootPanel;
+
     private JPanel leftPanel;
+
     private JPanel rightPanel;
+
     private JPanel searchPanel;
+
     private JPanel buttonPanel;
 
-    private JComboBox<Book> cmbBook =
+    private JComboBox<BookIssue> cmbIssue =
             new JComboBox<>();
 
-    private JComboBox<Member> cmbMember =
-            new JComboBox<>();
+    private JTextField txtMember =
+            new JTextField();
 
-    private JDateChooser dcIssueDate =
-            new JDateChooser();
+    private JTextField txtBook =
+            new JTextField();
 
-    private JDateChooser dcDueDate =
-            new JDateChooser();
+    private JTextField txtFine =
+            new JTextField();
+
+    private JTextField txtStatus =
+            new JTextField();
 
     private JTextField txtSearch =
             new JTextField();
 
-    private JButton btnIssue =
-            new JButton("📚 Issue");
+    private JButton btnPay =
+            new JButton("💰 Pay Fine");
 
     private JButton btnUpdate =
             new JButton("✏ Update");
@@ -77,20 +81,10 @@ public class IssueBookFrame extends JFrame {
 
     private DefaultTableModel tableModel;
 
-    private final BookService bookService =
-            new BookServiceImpl();
-
-    private final MemberService memberService =
-            new MemberServiceImpl();
-
     private final BookIssueService issueService =
             new BookIssueServiceImpl();
 
-    private final User loggedInUser;
-
-    public IssueBookFrame(User user){
-
-        this.loggedInUser = user;
+    public FineManagementFrame(){
 
         initializeUI();
 
@@ -98,11 +92,7 @@ public class IssueBookFrame extends JFrame {
 
         registerEvents();
 
-        loadBooks();
-
-        loadMembers();
-
-        loadIssuedBooks();
+        loadFineRecords();
 
         setVisible(true);
 
@@ -110,7 +100,7 @@ public class IssueBookFrame extends JFrame {
 
     private void initializeUI(){
 
-        setTitle("Issue Book");
+        setTitle("Fine Management");
 
         setSize(1500,900);
 
@@ -126,7 +116,7 @@ public class IssueBookFrame extends JFrame {
                         )
                 );
 
-        rootPanel.setBackground(BG);
+        rootPanel.setBackground(LIGHT);
 
         rootPanel.setBorder(
                 new EmptyBorder(
@@ -165,7 +155,7 @@ public class IssueBookFrame extends JFrame {
 
         JLabel title =
                 new JLabel(
-                        "📚 ISSUE BOOK"
+                        "💰 FINE MANAGEMENT"
                 );
 
         title.setForeground(Color.WHITE);
@@ -179,28 +169,11 @@ public class IssueBookFrame extends JFrame {
 
         date.setForeground(Color.WHITE);
 
-        date.setFont(
-                new Font(
-                        "Segoe UI",
-                        Font.PLAIN,
-                        14
-                )
-        );
+        header.add(title,BorderLayout.WEST);
 
-        header.add(
-                title,
-                BorderLayout.WEST
-        );
+        header.add(date,BorderLayout.EAST);
 
-        header.add(
-                date,
-                BorderLayout.EAST
-        );
-
-        rootPanel.add(
-                header,
-                BorderLayout.NORTH
-        );
+        rootPanel.add(header,BorderLayout.NORTH);
 
     }
     private void createCenterLayout() {
@@ -261,8 +234,8 @@ public class IssueBookFrame extends JFrame {
 
         panel.setPreferredSize(
                 new Dimension(
-                        450,
-                        700
+                        430,
+                        650
                 )
         );
 
@@ -313,42 +286,49 @@ public class IssueBookFrame extends JFrame {
                 panel,
                 gbc,
                 row++,
-                "Book",
-                cmbBook
+                "Issue",
+                cmbIssue
         );
+
+        txtMember.setEditable(false);
 
         addField(
                 panel,
                 gbc,
                 row++,
                 "Member",
-                cmbMember
+                txtMember
         );
 
-        dcIssueDate.setDateFormatString(
-                "dd-MM-yyyy"
-        );
-
-        dcDueDate.setDateFormatString(
-                "dd-MM-yyyy"
-        );
+        txtBook.setEditable(false);
 
         addField(
                 panel,
                 gbc,
                 row++,
-                "Issue Date",
-                dcIssueDate
+                "Book",
+                txtBook
         );
+
+        txtFine.setEditable(false);
 
         addField(
                 panel,
                 gbc,
                 row++,
-                "Due Date",
-                dcDueDate
+                "Fine Amount",
+                txtFine
         );
 
+        txtStatus.setEditable(false);
+
+        addField(
+                panel,
+                gbc,
+                row++,
+                "Payment Status",
+                txtStatus
+        );
 
         createButtonPanel();
 
@@ -385,10 +365,7 @@ public class IssueBookFrame extends JFrame {
 
         gbc.weightx = 0;
 
-        panel.add(
-                lbl,
-                gbc
-        );
+        panel.add(lbl,gbc);
 
         if(component instanceof JTextField field){
 
@@ -420,10 +397,7 @@ public class IssueBookFrame extends JFrame {
 
         gbc.weightx = 1;
 
-        panel.add(
-                component,
-                gbc
-        );
+        panel.add(component,gbc);
 
     }
 
@@ -438,9 +412,7 @@ public class IssueBookFrame extends JFrame {
                         )
                 );
 
-        searchPanel.setBackground(
-                Color.WHITE
-        );
+        searchPanel.setBackground(Color.WHITE);
 
         searchPanel.setBorder(
                 BorderFactory.createCompoundBorder(
@@ -467,7 +439,7 @@ public class IssueBookFrame extends JFrame {
 
         JLabel lbl =
                 new JLabel(
-                        "🔍 Search Issued Books"
+                        "🔍 Search Fine Records"
                 );
 
         lbl.setFont(
@@ -508,15 +480,15 @@ public class IssueBookFrame extends JFrame {
 
         buttonPanel.setOpaque(false);
 
-        styleButton(btnIssue,SUCCESS);
+        styleButton(btnPay,SUCCESS);
 
         styleButton(btnUpdate,PRIMARY);
 
         styleButton(btnDelete,DANGER);
 
-        styleButton(btnClear,GRAY);
+        styleButton(btnClear,new Color(97,97,97));
 
-        styleButton(btnSearch,PRIMARY);
+        styleButton(btnSearch,new Color(21,101,192));
 
         JButton btnRefresh =
                 new JButton("🔄 Refresh");
@@ -530,15 +502,11 @@ public class IssueBookFrame extends JFrame {
 
             clearForm();
 
-            loadBooks();
-
-            loadMembers();
-
-            loadIssuedBooks();
+            loadFineRecords();
 
         });
 
-        buttonPanel.add(btnIssue);
+        buttonPanel.add(btnPay);
 
         buttonPanel.add(btnUpdate);
 
@@ -554,29 +522,21 @@ public class IssueBookFrame extends JFrame {
 
     private void styleButtons(){
 
-        styleButton(btnIssue,SUCCESS);
+        styleButton(btnPay,SUCCESS);
 
         styleButton(btnUpdate,PRIMARY);
 
         styleButton(btnDelete,DANGER);
 
-        styleButton(btnClear,GRAY);
+        styleButton(btnClear,new Color(97,97,97));
 
-        styleButton(btnSearch,PRIMARY);
+        styleButton(btnSearch,new Color(21,101,192));
 
     }
 
     private void styleButton(
             JButton button,
             Color color){
-
-        button.setBackground(color);
-
-        button.setForeground(Color.WHITE);
-
-        button.setFocusPainted(false);
-
-        button.setBorderPainted(false);
 
         button.setFont(
                 new Font(
@@ -585,6 +545,14 @@ public class IssueBookFrame extends JFrame {
                         14
                 )
         );
+
+        button.setBackground(color);
+
+        button.setForeground(Color.WHITE);
+
+        button.setFocusPainted(false);
+
+        button.setBorderPainted(false);
 
         button.setCursor(
                 Cursor.getPredefinedCursor(
@@ -614,9 +582,9 @@ public class IssueBookFrame extends JFrame {
 
                                 "Member",
 
-                                "Issue Date",
+                                "Return Date",
 
-                                "Due Date",
+                                "Fine",
 
                                 "Status"
 
@@ -629,8 +597,7 @@ public class IssueBookFrame extends JFrame {
                     @Override
                     public boolean isCellEditable(
                             int row,
-                            int column
-                    ){
+                            int column){
 
                         return false;
 
@@ -641,18 +608,11 @@ public class IssueBookFrame extends JFrame {
         table =
                 new JTable(tableModel);
 
-        table.setRowHeight(36);
-
         table.setFont(FIELD_FONT);
 
-        table.setShowGrid(false);
+        table.setRowHeight(36);
 
-        table.setIntercellSpacing(
-                new Dimension(
-                        0,
-                        0
-                )
-        );
+        table.setShowGrid(false);
 
         table.setSelectionBackground(
                 new Color(
@@ -668,6 +628,10 @@ public class IssueBookFrame extends JFrame {
 
         table.setAutoCreateRowSorter(true);
 
+        table.setSelectionMode(
+                ListSelectionModel.SINGLE_SELECTION
+        );
+
         table.getTableHeader().setBackground(PRIMARY);
 
         table.getTableHeader().setForeground(Color.WHITE);
@@ -677,13 +641,6 @@ public class IssueBookFrame extends JFrame {
                         "Segoe UI",
                         Font.BOLD,
                         14
-                )
-        );
-
-        table.getTableHeader().setPreferredSize(
-                new Dimension(
-                        0,
-                        40
                 )
         );
 
@@ -720,42 +677,18 @@ public class IssueBookFrame extends JFrame {
 
     }
 
-    private void loadBooks(){
-
-        cmbBook.removeAllItems();
-
-        for(Book book : bookService.findAll()){
-
-            cmbBook.addItem(book);
-
-        }
-
-    }
-
-    private void loadMembers(){
-
-        cmbMember.removeAllItems();
-
-        for(Member member : memberService.findAll()){
-
-            cmbMember.addItem(member);
-
-        }
-
-    }
-
     private void registerEvents(){
 
-        btnIssue.addActionListener(
-                e -> issueBook()
+        btnPay.addActionListener(
+                e -> payFine()
         );
 
         btnUpdate.addActionListener(
-                e -> updateIssue()
+                e -> updateFine()
         );
 
         btnDelete.addActionListener(
-                e -> deleteIssue()
+                e -> deleteFine()
         );
 
         btnClear.addActionListener(
@@ -763,11 +696,15 @@ public class IssueBookFrame extends JFrame {
         );
 
         btnSearch.addActionListener(
-                e -> searchIssue()
+                e -> searchFine()
         );
 
         txtSearch.addActionListener(
-                e -> searchIssue()
+                e -> searchFine()
+        );
+
+        cmbIssue.addActionListener(
+                e -> loadFineDetails()
         );
 
         table.getSelectionModel()
@@ -784,158 +721,188 @@ public class IssueBookFrame extends JFrame {
                 );
 
     }
-    private void loadIssuedBooks() {
+
+    private void loadFineRecords(){
 
         tableModel.setRowCount(0);
 
-        for (BookIssue issue : issueService.findAll()) {
+        cmbIssue.removeAllItems();
 
-            tableModel.addRow(new Object[]{
+        for(BookIssue issue : issueService.findAll()){
 
-                    issue.getIssueId(),
+            if(issue.getFineAmount()!=null
+                    && issue.getFineAmount()>0){
 
-                    issue.getBook().getBookId(),
-                    issue.getMember().getMemberId(),
-                    issue.getIssueDate(),
+                cmbIssue.addItem(issue);
 
-                    issue.getDueDate(),
+                tableModel.addRow(
 
-                    issue.getStatus()
+                        new Object[]{
 
-            });
+                                issue.getIssueId(),
+
+                                issue.getBook().getTitle(),
+
+                                issue.getMember().getFirstName()
+                                        +" "
+                                        +issue.getMember().getLastName(),
+
+                                issue.getReturnDate(),
+
+                                issue.getFineAmount(),
+
+                                issue.getStatus()
+
+                        }
+
+                );
+
+            }
 
         }
 
     }
+    private void loadFineDetails() {
 
-    private void issueBook() {
+        if (cmbIssue.getSelectedItem() == null) {
 
-        try {
+            txtBook.setText("");
 
-            if (cmbBook.getSelectedItem() == null) {
+            txtMember.setText("");
 
-                JOptionPane.showMessageDialog(
-                        this,
-                        "Please select a book."
-                );
+            txtFine.setText("");
 
-                return;
+            txtStatus.setText("");
 
-            }
-
-            if (cmbMember.getSelectedItem() == null) {
-
-                JOptionPane.showMessageDialog(
-                        this,
-                        "Please select a member."
-                );
-
-                return;
-
-            }
-
-            BookIssue issue = new BookIssue();
-
-            issue.setBook(
-                    (Book) cmbBook.getSelectedItem()
-            );
-
-            issue.setMember(
-                    (Member) cmbMember.getSelectedItem()
-            );
-
-            issue.setIssuedBy(loggedInUser);
-
-            issue.setIssueDate(
-
-                    dcIssueDate.getDate()
-                            .toInstant()
-                            .atZone(
-                                    ZoneId.systemDefault()
-                            )
-                            .toLocalDate()
-
-            );
-
-            issue.setDueDate(
-
-                    dcDueDate.getDate()
-                            .toInstant()
-                            .atZone(
-                                    ZoneId.systemDefault()
-                            )
-                            .toLocalDate()
-
-            );
-
-
-
-            issue.setReturnDate(null);
-
-            issue.setFineAmount(0.0);
-
-            issue.setStatus("ISSUED");
-
-            issueService.issueBook(issue);
-
-            JOptionPane.showMessageDialog(
-
-                    this,
-
-                    "Book issued successfully."
-
-            );
-
-            clearForm();
-
-            loadIssuedBooks();
-
-        } catch (Exception exception) {
-
-            JOptionPane.showMessageDialog(
-
-                    this,
-
-                    exception.getMessage(),
-
-                    "Error",
-
-                    JOptionPane.ERROR_MESSAGE
-
-            );
+            return;
 
         }
 
+        BookIssue issue =
+                (BookIssue) cmbIssue.getSelectedItem();
+
+        txtBook.setText(
+                issue.getBook().getTitle()
+        );
+
+        txtMember.setText(
+                issue.getMember().getFirstName()
+                        + " "
+                        + issue.getMember().getLastName()
+        );
+
+        txtFine.setText(
+                String.format(
+                        "%.2f",
+                        issue.getFineAmount()
+                )
+        );
+
+        txtStatus.setText(
+                issue.getStatus()
+        );
+
     }
 
-    private void updateIssue() {
+    private void payFine() {
 
-        int row = table.getSelectedRow();
-
-        if (row == -1) {
+        if (cmbIssue.getSelectedItem() == null) {
 
             JOptionPane.showMessageDialog(
-
                     this,
-
                     "Please select a record."
-
             );
 
             return;
 
         }
 
-        row = table.convertRowIndexToModel(row);
+        BookIssue issue =
+                (BookIssue) cmbIssue.getSelectedItem();
 
-        Integer issueId = Integer.parseInt(
+        if (issue.getFineAmount() == null
+                || issue.getFineAmount() <= 0) {
 
-                tableModel.getValueAt(
-                        row,
-                        0
-                ).toString()
+            JOptionPane.showMessageDialog(
+                    this,
+                    "No fine available."
+            );
 
-        );
+            return;
+
+        }
+
+        int option =
+                JOptionPane.showConfirmDialog(
+
+                        this,
+
+                        "Mark fine as paid?",
+
+                        "Confirm",
+
+                        JOptionPane.YES_NO_OPTION
+
+                );
+
+        if (option != JOptionPane.YES_OPTION) {
+
+            return;
+
+        }
+
+        issue.setFineAmount(0.0);
+
+        issue.setStatus("RETURNED");
+
+        if (issueService.update(issue)) {
+
+            JOptionPane.showMessageDialog(
+                    this,
+                    "Fine paid successfully."
+            );
+
+            clearForm();
+
+            loadFineRecords();
+
+        } else {
+
+            JOptionPane.showMessageDialog(
+                    this,
+                    "Unable to update record."
+            );
+
+        }
+
+    }
+
+    private void updateFine() {
+
+        int row =
+                table.getSelectedRow();
+
+        if (row == -1) {
+
+            JOptionPane.showMessageDialog(
+                    this,
+                    "Please select a record."
+            );
+
+            return;
+
+        }
+
+        row =
+                table.convertRowIndexToModel(row);
+
+        Integer issueId =
+                Integer.parseInt(
+                        tableModel.getValueAt(
+                                row,
+                                0
+                        ).toString()
+                );
 
         Optional<BookIssue> optional =
                 issueService.findById(issueId);
@@ -943,77 +910,47 @@ public class IssueBookFrame extends JFrame {
         if (optional.isEmpty()) {
 
             JOptionPane.showMessageDialog(
-
                     this,
-
-                    "Issue record not found."
-
+                    "Record not found."
             );
 
             return;
 
         }
 
-        BookIssue issue = optional.get();
+        BookIssue issue =
+                optional.get();
 
-        issue.setBook(
-                (Book) cmbBook.getSelectedItem()
-        );
+        issue.setFineAmount(
 
-        issue.setMember(
-                (Member) cmbMember.getSelectedItem()
-        );
-
-        issue.setIssueDate(
-
-                dcIssueDate.getDate()
-                        .toInstant()
-                        .atZone(
-                                ZoneId.systemDefault()
-                        )
-                        .toLocalDate()
-
-        );
-
-        issue.setDueDate(
-
-                dcDueDate.getDate()
-                        .toInstant()
-                        .atZone(
-                                ZoneId.systemDefault()
-                        )
-                        .toLocalDate()
+                Double.parseDouble(
+                        txtFine.getText()
+                )
 
         );
 
         if (issueService.update(issue)) {
 
             JOptionPane.showMessageDialog(
-
                     this,
-
-                    "Issue updated successfully."
-
+                    "Fine updated successfully."
             );
 
             clearForm();
 
-            loadIssuedBooks();
+            loadFineRecords();
 
         } else {
 
             JOptionPane.showMessageDialog(
-
                     this,
-
-                    "Unable to update issue."
-
+                    "Unable to update fine."
             );
 
         }
 
     }
-    private void deleteIssue() {
+    private void deleteFine() {
 
         int row = table.getSelectedRow();
 
@@ -1021,7 +958,7 @@ public class IssueBookFrame extends JFrame {
 
             JOptionPane.showMessageDialog(
                     this,
-                    "Please select an issue record."
+                    "Please select a record."
             );
 
             return;
@@ -1035,9 +972,9 @@ public class IssueBookFrame extends JFrame {
 
                         this,
 
-                        "Delete selected issue record?",
+                        "Delete selected fine record?",
 
-                        "Confirm",
+                        "Confirm Delete",
 
                         JOptionPane.YES_NO_OPTION,
 
@@ -1063,25 +1000,25 @@ public class IssueBookFrame extends JFrame {
 
             JOptionPane.showMessageDialog(
                     this,
-                    "Issue record deleted successfully."
+                    "Fine record deleted successfully."
             );
 
             clearForm();
 
-            loadIssuedBooks();
+            loadFineRecords();
 
         } else {
 
             JOptionPane.showMessageDialog(
                     this,
-                    "Unable to delete issue record."
+                    "Unable to delete fine record."
             );
 
         }
 
     }
 
-    private void searchIssue() {
+    private void searchFine() {
 
         String keyword =
                 txtSearch.getText()
@@ -1092,13 +1029,24 @@ public class IssueBookFrame extends JFrame {
 
         for (BookIssue issue : issueService.findAll()) {
 
+            if (issue.getFineAmount() == null
+                    || issue.getFineAmount() <= 0) {
+
+                continue;
+
+            }
+
             String book =
-                    issue.getBook().getTitle().toLowerCase();
+                    issue.getBook()
+                            .getTitle()
+                            .toLowerCase();
 
             String member =
-                    (issue.getMember().getFirstName()
+                    (issue.getMember()
+                            .getFirstName()
                             + " "
-                            + issue.getMember().getLastName())
+                            + issue.getMember()
+                            .getLastName())
                             .toLowerCase();
 
             if (book.contains(keyword)
@@ -1114,9 +1062,9 @@ public class IssueBookFrame extends JFrame {
                                 + " "
                                 + issue.getMember().getLastName(),
 
-                        issue.getIssueDate(),
+                        issue.getReturnDate(),
 
-                        issue.getDueDate(),
+                        issue.getFineAmount(),
 
                         issue.getStatus()
 
@@ -1157,55 +1105,26 @@ public class IssueBookFrame extends JFrame {
 
         }
 
-        BookIssue issue = optional.get();
+        BookIssue issue =
+                optional.get();
 
-        cmbBook.setSelectedItem(
-                issue.getBook()
-        );
+        cmbIssue.setSelectedItem(issue);
 
-        cmbMember.setSelectedItem(
-                issue.getMember()
-        );
-
-        if (issue.getIssueDate() != null) {
-
-            dcIssueDate.setDate(
-                    java.sql.Date.valueOf(
-                            issue.getIssueDate()
-                    )
-            );
-
-        } else {
-
-            dcIssueDate.setDate(null);
-
-        }
-
-        if (issue.getDueDate() != null) {
-
-            dcDueDate.setDate(
-                    java.sql.Date.valueOf(
-                            issue.getDueDate()
-                    )
-            );
-
-        } else {
-
-            dcDueDate.setDate(null);
-
-        }
+        loadFineDetails();
 
     }
 
     private void clearForm() {
 
-        cmbBook.setSelectedIndex(-1);
+        cmbIssue.setSelectedIndex(-1);
 
-        cmbMember.setSelectedIndex(-1);
+        txtBook.setText("");
 
-        dcIssueDate.setDate(null);
+        txtMember.setText("");
 
-        dcDueDate.setDate(null);
+        txtFine.setText("");
+
+        txtStatus.setText("");
 
         txtSearch.setText("");
 
@@ -1226,13 +1145,10 @@ public class IssueBookFrame extends JFrame {
             } catch (Exception ignored) {
             }
 
-            User user = new User();
-
-            user.setUserId(1);
-
-            new IssueBookFrame(user);
+            new FineManagementFrame();
 
         });
 
     }
+
 }

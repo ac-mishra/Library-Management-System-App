@@ -100,20 +100,98 @@ public class AuthorDAOImpl
         return Optional.empty();
 
     }
-
     @Override
     public Author save(Author author) {
-        throw new UnsupportedOperationException();
+
+        try (
+                Connection connection = DBConnection.getConnection();
+
+                PreparedStatement preparedStatement =
+                        connection.prepareStatement(
+                                AuthorQueries.INSERT,
+                                PreparedStatement.RETURN_GENERATED_KEYS
+                        )
+        ) {
+
+            preparedStatement.setString(1, author.getFirstName());
+            preparedStatement.setString(2, author.getLastName());
+            preparedStatement.setString(3, author.getEmail());
+            preparedStatement.setString(4, author.getPhone());
+            preparedStatement.setString(5, author.getCountry());
+            preparedStatement.setString(6, author.getBiography());
+
+            preparedStatement.executeUpdate();
+
+            try (ResultSet rs = preparedStatement.getGeneratedKeys()) {
+
+                if (rs.next()) {
+
+                    author.setAuthorId(rs.getInt(1));
+
+                }
+
+            }
+
+            return author;
+
+        } catch (SQLException e) {
+
+            throw new RuntimeException(e);
+
+        }
+
     }
 
     @Override
     public boolean update(Author author) {
-        throw new UnsupportedOperationException();
-    }
 
+        try (
+                Connection connection = DBConnection.getConnection();
+
+                PreparedStatement preparedStatement =
+                        connection.prepareStatement(
+                                AuthorQueries.UPDATE
+                        )
+        ) {
+
+            preparedStatement.setString(1, author.getFirstName());
+            preparedStatement.setString(2, author.getLastName());
+            preparedStatement.setString(3, author.getEmail());
+            preparedStatement.setString(4, author.getPhone());
+            preparedStatement.setString(5, author.getCountry());
+            preparedStatement.setString(6, author.getBiography());
+            preparedStatement.setInt(7, author.getAuthorId());
+
+            return preparedStatement.executeUpdate() > 0;
+
+        } catch (SQLException e) {
+
+            throw new RuntimeException(e);
+
+        }
+
+    }
     @Override
     public boolean delete(Integer id) {
-        throw new UnsupportedOperationException();
-    }
 
+        try (
+                Connection connection = DBConnection.getConnection();
+
+                PreparedStatement preparedStatement =
+                        connection.prepareStatement(
+                                AuthorQueries.DELETE
+                        )
+        ) {
+
+            preparedStatement.setInt(1, id);
+
+            return preparedStatement.executeUpdate() > 0;
+
+        } catch (SQLException e) {
+
+            throw new RuntimeException(e);
+
+        }
+
+    }
 }

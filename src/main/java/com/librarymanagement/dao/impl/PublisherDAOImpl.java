@@ -6,6 +6,7 @@ import com.librarymanagement.entity.Publisher;
 import com.librarymanagement.mapper.PublisherRowMapper;
 import com.librarymanagement.repository.PublisherRepository;
 
+import javax.swing.*;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -106,21 +107,112 @@ public class PublisherDAOImpl
     @Override
     public Publisher save(Publisher publisher) {
 
-        throw new UnsupportedOperationException();
+        try (
+
+                Connection connection =
+                        DBConnection.getConnection();
+
+                PreparedStatement preparedStatement =
+                        connection.prepareStatement(
+                                PublisherQueries.INSERT,
+                                PreparedStatement.RETURN_GENERATED_KEYS
+                        )
+
+        ) {
+
+            preparedStatement.setString(1,publisher.getPublisherName());
+            preparedStatement.setString(2,publisher.getEmail());
+            preparedStatement.setString(3,publisher.getPhone());
+            preparedStatement.setString(4,publisher.getAddress());
+            preparedStatement.setString(5,publisher.getWebsite());
+
+            preparedStatement.executeUpdate();
+
+            try(ResultSet rs = preparedStatement.getGeneratedKeys()){
+
+                if(rs.next()){
+
+                    publisher.setPublisherId(rs.getInt(1));
+
+                }
+
+            }
+
+            return publisher;
+
+        } catch (SQLException e) {
+
+            throw new RuntimeException(e);
+
+        }
 
     }
 
     @Override
     public boolean update(Publisher publisher) {
 
-        throw new UnsupportedOperationException();
+        try (
+
+                Connection connection =
+                        DBConnection.getConnection();
+
+                PreparedStatement preparedStatement =
+                        connection.prepareStatement(
+                                PublisherQueries.UPDATE
+                        )
+
+        ) {
+
+            preparedStatement.setString(1,publisher.getPublisherName());
+            preparedStatement.setString(2,publisher.getEmail());
+            preparedStatement.setString(3,publisher.getPhone());
+            preparedStatement.setString(4,publisher.getAddress());
+            preparedStatement.setString(5,publisher.getWebsite());
+            preparedStatement.setInt(6,publisher.getPublisherId());
+
+            return preparedStatement.executeUpdate()>0;
+
+        } catch (SQLException e) {
+
+            throw new RuntimeException(e);
+
+        }
 
     }
 
     @Override
     public boolean delete(Integer id) {
 
-        throw new UnsupportedOperationException();
+        try (
+
+                Connection connection =
+                        DBConnection.getConnection();
+
+                PreparedStatement preparedStatement =
+                        connection.prepareStatement(
+                                PublisherQueries.DELETE
+                        )
+
+        ) {
+
+            preparedStatement.setInt(1,id);
+
+            return preparedStatement.executeUpdate()>0;
+
+        }catch (SQLException e) {
+
+            e.printStackTrace();
+
+            JOptionPane.showMessageDialog(
+                    null,
+                    e.getMessage(),
+                    "SQL Error",
+                    JOptionPane.ERROR_MESSAGE
+            );
+
+            throw new RuntimeException(e);
+
+        }
 
     }
 

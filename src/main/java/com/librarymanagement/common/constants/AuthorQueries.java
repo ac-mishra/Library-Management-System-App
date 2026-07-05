@@ -17,4 +17,36 @@ public final class AuthorQueries {
             WHERE author_id=?
             """;
 
+    public static final String INSERT = """
+            INSERT INTO authors
+            (
+                first_name,
+                last_name,
+                email,
+                phone,
+                country,
+                biography
+            )
+            VALUES
+            (
+                ?,?,?,?,?,?
+            )
+            """;
+
+    public static final String UPDATE = """
+            UPDATE authors
+            SET
+                first_name=?,
+                last_name=?,
+                email=?,
+                phone=?,
+                country=?,
+                biography=?
+            WHERE author_id=?
+            """;
+
+    public static final String DELETE = """
+            DELETE FROM authors
+            WHERE author_id=?
+            """;
 }

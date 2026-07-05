@@ -47,10 +47,21 @@ public class BookReturnDAOImpl
                     bookReturn.getBookIssue().getIssueId()
             );
 
-            preparedStatement.setInt(
-                    2,
-                    bookReturn.getReceivedBy().getUserId()
-            );
+            if (bookReturn.getReceivedBy() == null) {
+
+                preparedStatement.setNull(
+                        2,
+                        java.sql.Types.INTEGER
+                );
+
+            } else {
+
+                preparedStatement.setInt(
+                        2,
+                        bookReturn.getReceivedBy().getUserId()
+                );
+
+            }
 
             preparedStatement.setDate(
                     3,

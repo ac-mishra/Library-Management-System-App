@@ -1,84 +1,122 @@
 package com.librarymanagement.ui.books;
 
 import com.librarymanagement.entity.Author;
+import com.librarymanagement.entity.Book;
 import com.librarymanagement.entity.Category;
 import com.librarymanagement.entity.Publisher;
-import com.librarymanagement.service.BookService;
-import com.librarymanagement.service.impl.BookServiceImpl;
-import com.librarymanagement.entity.Book;
-import javax.swing.border.EmptyBorder;
-import javax.swing.*;
-import javax.swing.table.DefaultTableModel;
-import java.awt.*;
-import java.util.Optional;
-
 import com.librarymanagement.service.AuthorService;
+import com.librarymanagement.service.BookService;
 import com.librarymanagement.service.CategoryService;
 import com.librarymanagement.service.PublisherService;
-
 import com.librarymanagement.service.impl.AuthorServiceImpl;
+import com.librarymanagement.service.impl.BookServiceImpl;
 import com.librarymanagement.service.impl.CategoryServiceImpl;
 import com.librarymanagement.service.impl.PublisherServiceImpl;
 
-/**
- * Book Management Screen.
- *
- * @author Amrit Chandan Mishra
- * @version 1.0.0
- */
+import javax.swing.*;
+import javax.swing.border.*;
+import javax.swing.table.DefaultTableModel;
+import javax.swing.table.JTableHeader;
+import java.awt.*;
+import java.util.Optional;
+
 public class BookManagementFrame extends JFrame {
 
-    private final JTextField txtIsbn =
-            new JTextField();
+    /*====================================================
+                      COLOR PALETTE
+    ====================================================*/
 
-    private final JTextField txtTitle =
-            new JTextField();
+    private static final Color PRIMARY =
+            new Color(25,118,210);
 
-    private final JTextField txtEdition =
-            new JTextField();
+    private static final Color PRIMARY_DARK =
+            new Color(13,71,161);
 
-    private final JTextField txtLanguage =
-            new JTextField();
+    private static final Color SUCCESS =
+            new Color(46,125,50);
 
-    private final JTextField txtPublishYear =
-            new JTextField();
+    private static final Color DANGER =
+            new Color(211,47,47);
 
-    private final JTextField txtPages =
-            new JTextField();
+    private static final Color WARNING =
+            new Color(251,140,0);
 
-    private final JTextArea txtDescription =
-            new JTextArea();
+    private static final Color LIGHT =
+            new Color(245,247,250);
 
-    private final JTextField txtSearch =
-            new JTextField(20);
+    private static final Color CARD =
+            Color.WHITE;
 
-    private final JComboBox<Category> cmbCategory =
+    private static final Color BORDER =
+            new Color(224,224,224);
+
+    private static final Font TITLE_FONT =
+            new Font("Segoe UI",Font.BOLD,30);
+
+    private static final Font HEADER_FONT =
+            new Font("Segoe UI",Font.BOLD,15);
+
+    private static final Font NORMAL_FONT =
+            new Font("Segoe UI",Font.PLAIN,14);
+
+    /*====================================================
+                        COMPONENTS
+    ====================================================*/
+
+    private JPanel rootPanel;
+    private JPanel headerPanel;
+    private JPanel centerPanel;
+    private JPanel leftPanel;
+    private JPanel rightPanel;
+    private JPanel searchPanel;
+    private JPanel buttonPanel;
+    private JPanel statusPanel;
+
+    private JLabel lblTitle;
+    private JLabel lblSubtitle;
+    private JLabel lblStatus;
+
+    private JTextField txtIsbn = new JTextField();
+    private JTextField txtTitle = new JTextField();
+    private JTextField txtEdition = new JTextField();
+    private JTextField txtLanguage = new JTextField();
+    private JTextField txtPublishYear = new JTextField();
+    private JTextField txtPages = new JTextField();
+    private JTextArea txtDescription = new JTextArea();
+
+    private JTextField txtSearch = new JTextField();
+
+    private JComboBox<Category> cmbCategory =
             new JComboBox<>();
 
-    private final JComboBox<Author> cmbAuthor =
+    private JComboBox<Author> cmbAuthor =
             new JComboBox<>();
 
-    private final JComboBox<Publisher> cmbPublisher =
+    private JComboBox<Publisher> cmbPublisher =
             new JComboBox<>();
 
-    private final JButton btnAdd =
-            new JButton("Add");
+    private JButton btnAdd =
+            new JButton("➕  Add");
 
-    private final JButton btnUpdate =
-            new JButton("Update");
+    private JButton btnUpdate =
+            new JButton("✏  Update");
 
-    private final JButton btnDelete =
-            new JButton("Delete");
+    private JButton btnDelete =
+            new JButton("🗑  Delete");
 
-    private final JButton btnClear =
-            new JButton("Clear");
+    private JButton btnClear =
+            new JButton("🧹  Clear");
 
-    private final JButton btnSearch =
-            new JButton("Search");
+    private JButton btnSearch =
+            new JButton("🔍 Search");
 
     private JTable table;
 
     private DefaultTableModel tableModel;
+
+    /*====================================================
+                       SERVICES
+    ====================================================*/
 
     private final BookService bookService =
             new BookServiceImpl();
@@ -92,7 +130,9 @@ public class BookManagementFrame extends JFrame {
     private final PublisherService publisherService =
             new PublisherServiceImpl();
 
-    private JPanel mainPanel;
+    /*====================================================
+                       CONSTRUCTOR
+    ====================================================*/
 
     public BookManagementFrame() {
 
@@ -110,263 +150,564 @@ public class BookManagementFrame extends JFrame {
 
         loadBooks();
 
+        setVisible(true);
     }
 
-    /**
-     * Initializes the user interface.
-     */
+    /*====================================================
+                    INITIALIZE UI
+    ====================================================*/
+
     private void initializeUI() {
 
-        setTitle("Book Management");
-
-        setSize(1300, 750);
-
-        setLocationRelativeTo(null);
+        setTitle("Library Management System - Book Management");
 
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 
-        mainPanel = new JPanel(
-                new BorderLayout(10, 10)
+        setSize(1550,900);
+
+        setLocationRelativeTo(null);
+
+        rootPanel = new JPanel(new BorderLayout(15,15));
+
+        rootPanel.setBackground(LIGHT);
+
+        rootPanel.setBorder(
+                new EmptyBorder(15,15,15,15)
         );
 
-        mainPanel.setBorder(
-                new EmptyBorder(15, 15, 15, 15)
+        createHeader();
+
+        createCenterLayout();
+
+        createStatusBar();
+
+        add(rootPanel);
+
+    }
+        /*====================================================
+                    HEADER PANEL
+    ====================================================*/
+
+    private void createHeader() {
+
+        headerPanel = new JPanel(new BorderLayout());
+
+        headerPanel.setBackground(PRIMARY);
+
+        headerPanel.setBorder(
+                new EmptyBorder(20,25,20,25)
         );
 
-        JLabel lblTitle =
-                new JLabel(
-                        "BOOK MANAGEMENT",
-                        SwingConstants.CENTER
-                );
+        JPanel titlePanel = new JPanel();
 
-        lblTitle.setFont(
-                new Font("Segoe UI", Font.BOLD, 26)
+        titlePanel.setOpaque(false);
+
+        titlePanel.setLayout(
+                new BoxLayout(titlePanel, BoxLayout.Y_AXIS)
         );
 
-        mainPanel.add(
-                lblTitle,
+        lblTitle = new JLabel("📚  BOOK MANAGEMENT");
+
+        lblTitle.setFont(TITLE_FONT);
+
+        lblTitle.setForeground(Color.WHITE);
+
+        lblSubtitle = new JLabel(
+                "Manage Books • Search • Update • Delete • Inventory"
+        );
+
+        lblSubtitle.setFont(
+                new Font("Segoe UI", Font.PLAIN, 15)
+        );
+
+        lblSubtitle.setForeground(
+                new Color(235,240,255)
+        );
+
+        titlePanel.add(lblTitle);
+
+        titlePanel.add(Box.createVerticalStrut(5));
+
+        titlePanel.add(lblSubtitle);
+
+        JLabel lblDate = new JLabel(
+                java.time.LocalDate.now().toString()
+        );
+
+        lblDate.setFont(
+                new Font("Segoe UI", Font.BOLD, 15)
+        );
+
+        lblDate.setForeground(Color.WHITE);
+
+        headerPanel.add(titlePanel, BorderLayout.WEST);
+
+        headerPanel.add(lblDate, BorderLayout.EAST);
+
+        rootPanel.add(headerPanel, BorderLayout.NORTH);
+    }
+
+    /*====================================================
+                    CENTER LAYOUT
+    ====================================================*/
+
+    private void createCenterLayout() {
+
+        centerPanel = new JPanel(
+                new BorderLayout(20,20)
+        );
+
+        centerPanel.setOpaque(false);
+
+        leftPanel = createFormCard();
+
+        rightPanel = new JPanel(
+                new BorderLayout(15,15)
+        );
+
+        rightPanel.setOpaque(false);
+
+        createSearchPanel();
+
+        rightPanel.add(
+                searchPanel,
                 BorderLayout.NORTH
         );
 
-        JPanel formPanel =
-                new JPanel(new GridBagLayout());
+        centerPanel.add(
+                leftPanel,
+                BorderLayout.WEST
+        );
+
+        centerPanel.add(
+                rightPanel,
+                BorderLayout.CENTER
+        );
+
+        rootPanel.add(
+                centerPanel,
+                BorderLayout.CENTER
+        );
+    }
+
+    /*====================================================
+                    LEFT FORM CARD
+    ====================================================*/
+
+    private JPanel createFormCard() {
+
+        JPanel card = new JPanel(
+                new GridBagLayout()
+        );
+
+        card.setBackground(CARD);
+
+        card.setPreferredSize(
+                new Dimension(420,650)
+        );
+
+        card.setBorder(
+                BorderFactory.createCompoundBorder(
+                        new LineBorder(BORDER,1,true),
+                        new EmptyBorder(25,25,25,25)
+                )
+        );
 
         GridBagConstraints gbc =
                 new GridBagConstraints();
 
-        gbc.insets =
-                new Insets(8, 8, 8, 8);
+        gbc.insets = new Insets(8,8,8,8);
 
-        gbc.fill =
-                GridBagConstraints.HORIZONTAL;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+
+        gbc.weightx = 1;
+
+        int row = 0;
+
+        addField(card, gbc, row++,
+                "ISBN *",
+                txtIsbn);
+
+        addField(card, gbc, row++,
+                "Book Title *",
+                txtTitle);
+
+        addField(card, gbc, row++,
+                "Category *",
+                cmbCategory);
+
+        addField(card, gbc, row++,
+                "Author *",
+                cmbAuthor);
+
+        addField(card, gbc, row++,
+                "Publisher *",
+                cmbPublisher);
+
+        addField(card, gbc, row++,
+                "Edition",
+                txtEdition);
+
+        addField(card, gbc, row++,
+                "Language",
+                txtLanguage);
+
+        addField(card, gbc, row++,
+                "Publish Year",
+                txtPublishYear);
+
+        addField(card, gbc, row++,
+                "Pages",
+                txtPages);
+
+        txtDescription.setRows(5);
+
+        txtDescription.setLineWrap(true);
+
+        txtDescription.setWrapStyleWord(true);
+
+        txtDescription.setFont(NORMAL_FONT);
+
+        JScrollPane descriptionPane =
+                new JScrollPane(txtDescription);
+
+        txtDescription.setPreferredSize(
+                new Dimension(240, 180)
+        );
+
+        addField(card, gbc, row++,
+                "Description",
+                descriptionPane);
+
+        createButtonPanel();
 
         gbc.gridx = 0;
-        gbc.gridy = 0;
 
-        formPanel.add(
-                new JLabel("ISBN"),
-                gbc
-        );
+        gbc.gridy = row;
+
+        gbc.gridwidth = 2;
+
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+
+        card.add(buttonPanel, gbc);
+
+        return card;
+    }
+
+    /*====================================================
+                ADD LABEL + COMPONENT
+    ====================================================*/
+
+    private void addField(
+            JPanel panel,
+            GridBagConstraints gbc,
+            int row,
+            String label,
+            Component component) {
+
+        JLabel lbl = new JLabel(label);
+
+        lbl.setFont(HEADER_FONT);
+
+        gbc.gridx = 0;
+
+        gbc.gridy = row;
+
+        gbc.weightx = 0;
+
+        panel.add(lbl, gbc);
+
+        styleComponent(component);
 
         gbc.gridx = 1;
 
-        txtIsbn.setColumns(20);
+        gbc.weightx = 1;
 
-        formPanel.add(
-                txtIsbn,
-                gbc
+        panel.add(component, gbc);
+    }
+
+    /*====================================================
+                    COMPONENT STYLING
+    ====================================================*/
+
+    private void styleComponent(Component component) {
+
+        if(component instanceof JTextField field){
+
+            field.setFont(NORMAL_FONT);
+
+            field.setPreferredSize(
+                    new Dimension(250,42)
+            );
+        }
+
+        if(component instanceof JComboBox<?> combo){
+
+            combo.setFont(NORMAL_FONT);
+
+            combo.setPreferredSize(
+                    new Dimension(250,40)
+            );
+        }
+
+        if(component instanceof JScrollPane pane){
+
+            pane.setBorder(
+                    BorderFactory.createLineBorder(BORDER)
+            );
+        }
+    }
+
+    /*====================================================
+                    SEARCH PANEL
+    ====================================================*/
+
+    private void createSearchPanel() {
+
+        searchPanel = new JPanel(
+                new BorderLayout(15,15)
         );
 
-        gbc.gridx = 2;
+        searchPanel.setBackground(Color.WHITE);
 
-        formPanel.add(
-                new JLabel("Title"),
-                gbc
+        searchPanel.setBorder(
+                BorderFactory.createCompoundBorder(
+                        new LineBorder(BORDER,1,true),
+                        new EmptyBorder(20,20,20,20)
+                )
         );
 
-        gbc.gridx = 3;
-
-        formPanel.add(
-                txtTitle,
-                gbc
+        JLabel lblSearch = new JLabel(
+                "🔍 Search Books"
         );
 
-        gbc.gridx = 0;
-        gbc.gridy++;
-
-        formPanel.add(
-                new JLabel("Category"),
-                gbc
+        lblSearch.setFont(
+                new Font("Segoe UI",
+                        Font.BOLD,
+                        20)
         );
 
-        gbc.gridx = 1;
+        txtSearch.setFont(NORMAL_FONT);
 
-        formPanel.add(
-                cmbCategory,
-                gbc
+        txtSearch.setPreferredSize(
+                new Dimension(300,40)
         );
 
-        gbc.gridx = 2;
-
-        formPanel.add(
-                new JLabel("Author"),
-                gbc
-        );
-
-        gbc.gridx = 3;
-
-        formPanel.add(
-                cmbAuthor,
-                gbc
-        );
-
-        gbc.gridx = 0;
-        gbc.gridy++;
-
-        formPanel.add(
-                new JLabel("Publisher"),
-                gbc
-        );
-
-        gbc.gridx = 1;
-
-        formPanel.add(
-                cmbPublisher,
-                gbc
-        );
-
-        gbc.gridx = 2;
-
-        formPanel.add(
-                new JLabel("Edition"),
-                gbc
-        );
-
-        gbc.gridx = 3;
-
-        formPanel.add(
-                txtEdition,
-                gbc
-        );
-
-        gbc.gridx = 0;
-        gbc.gridy++;
-
-        formPanel.add(
-                new JLabel("Language"),
-                gbc
-        );
-
-        gbc.gridx = 1;
-
-        formPanel.add(
-                txtLanguage,
-                gbc
-        );
-
-        gbc.gridx = 2;
-
-        formPanel.add(
-                new JLabel("Publish Year"),
-                gbc
-        );
-
-        gbc.gridx = 3;
-
-        formPanel.add(
-                txtPublishYear,
-                gbc
-        );
-
-        gbc.gridx = 0;
-        gbc.gridy++;
-
-        formPanel.add(
-                new JLabel("Pages"),
-                gbc
-        );
-
-        gbc.gridx = 1;
-
-        formPanel.add(
-                txtPages,
-                gbc
-        );
-
-        gbc.gridx = 2;
-
-        formPanel.add(
-                new JLabel("Description"),
-                gbc
-        );
-
-        gbc.gridx = 3;
-
-        JScrollPane descriptionScroll =
-                new JScrollPane(
-                        txtDescription
-                );
-
-        descriptionScroll.setPreferredSize(
-                new Dimension(250, 80)
-        );
-
-        formPanel.add(
-                descriptionScroll,
-                gbc
-        );
-
-        JPanel buttonPanel =
+        JPanel inputPanel =
                 new JPanel(
                         new FlowLayout(
-                                FlowLayout.CENTER,
+                                FlowLayout.LEFT,
                                 15,
-                                10
+                                5
                         )
                 );
 
+        inputPanel.setOpaque(false);
+
+        inputPanel.add(lblSearch);
+
+        inputPanel.add(txtSearch);
+
+        inputPanel.add(btnSearch);
+
+        searchPanel.add(
+                inputPanel,
+                BorderLayout.CENTER
+        );
+
+        styleButtons();
+    }
+
+        /*====================================================
+                    BUTTON PANEL
+    ====================================================*/
+
+    private void createButtonPanel() {
+
+        buttonPanel = new JPanel(
+                new GridLayout(3,2,12,12)
+        );
+
+        buttonPanel.setOpaque(false);
+
         buttonPanel.add(btnAdd);
         buttonPanel.add(btnUpdate);
+
         buttonPanel.add(btnDelete);
         buttonPanel.add(btnClear);
 
-        buttonPanel.add(new JLabel("Search"));
-
-        buttonPanel.add(txtSearch);
-
         buttonPanel.add(btnSearch);
-        JPanel topPanel =
+
+        JButton btnRefresh =
+                new JButton("🔄 Refresh");
+
+        styleButton(
+                btnRefresh,
+                new Color(0,150,136)
+        );
+
+        btnRefresh.addActionListener(e -> {
+
+            txtSearch.setText("");
+
+            clearForm();
+
+            loadBooks();
+
+            updateStatus(
+                    "Book list refreshed."
+            );
+
+        });
+
+        buttonPanel.add(btnRefresh);
+    }
+
+    /*====================================================
+                    BUTTON STYLING
+    ====================================================*/
+
+    private void styleButtons() {
+
+        styleButton(btnAdd,
+                new Color(46,125,50));
+
+        styleButton(btnUpdate,
+                PRIMARY);
+
+        styleButton(btnDelete,
+                new Color(211,47,47));
+
+        styleButton(btnClear,
+                new Color(97,97,97));
+
+        styleButton(btnSearch,
+                new Color(21,101,192));
+    }
+
+    private void styleButton(
+            JButton button,
+            Color color) {
+
+        button.setFont(
+                new Font(
+                        "Segoe UI",
+                        Font.BOLD,
+                        14
+                )
+        );
+
+        button.setBackground(color);
+
+        button.setForeground(Color.WHITE);
+
+        button.setFocusPainted(false);
+
+        button.setBorderPainted(false);
+
+        button.setCursor(
+                Cursor.getPredefinedCursor(
+                        Cursor.HAND_CURSOR
+                )
+        );
+
+        button.setPreferredSize(
+                new Dimension(160,42)
+        );
+
+        button.setOpaque(true);
+    }
+
+    /*====================================================
+                    STATUS BAR
+    ====================================================*/
+
+    private void createStatusBar() {
+
+        statusPanel =
                 new JPanel(
                         new BorderLayout()
                 );
 
-        topPanel.add(
-                formPanel,
-                BorderLayout.CENTER
+        statusPanel.setBackground(
+                PRIMARY_DARK
         );
 
-        topPanel.add(
-                buttonPanel,
+        statusPanel.setBorder(
+                new EmptyBorder(
+                        8,
+                        15,
+                        8,
+                        15
+                )
+        );
+
+        lblStatus =
+                new JLabel(
+                        "Ready"
+                );
+
+        lblStatus.setForeground(
+                Color.WHITE
+        );
+
+        lblStatus.setFont(
+                new Font(
+                        "Segoe UI",
+                        Font.PLAIN,
+                        13
+                )
+        );
+
+        JLabel lblVersion =
+                new JLabel(
+                        "Library Management System  |  Book Module"
+                );
+
+        lblVersion.setForeground(
+                Color.WHITE
+        );
+
+        lblVersion.setFont(
+                new Font(
+                        "Segoe UI",
+                        Font.PLAIN,
+                        13
+                )
+        );
+
+        statusPanel.add(
+                lblStatus,
+                BorderLayout.WEST
+        );
+
+        statusPanel.add(
+                lblVersion,
+                BorderLayout.EAST
+        );
+
+        rootPanel.add(
+                statusPanel,
                 BorderLayout.SOUTH
         );
-
-        mainPanel.add(
-                topPanel,
-                BorderLayout.CENTER
-        );
-
-        add(mainPanel);
-
     }
 
-    /**
-     * Initializes JTable.
-     */
+    private void updateStatus(String message) {
+
+        if (lblStatus != null) {
+
+            lblStatus.setText(message);
+
+        }
+    }
+
+    /*====================================================
+                    TABLE INITIALIZATION
+    ====================================================*/
+
     private void initializeTable() {
 
-        tableModel = new DefaultTableModel();
-
-        tableModel.setColumnIdentifiers(
+        tableModel = new DefaultTableModel(
                 new Object[]{
                         "ID",
                         "ISBN",
@@ -377,81 +718,128 @@ public class BookManagementFrame extends JFrame {
                         "Edition",
                         "Language",
                         "Year"
-                }
-        );
+                },
+                0
+        ) {
+
+            @Override
+            public boolean isCellEditable(
+                    int row,
+                    int column
+            ) {
+                return false;
+            }
+
+        };
 
         table = new JTable(tableModel);
 
-        table.setRowHeight(28);
+        table.setFont(NORMAL_FONT);
+
+        table.setRowHeight(36);
+
+        table.setGridColor(
+                new Color(235,235,235)
+        );
+
+        table.setShowVerticalLines(false);
+
+        table.setSelectionBackground(
+                new Color(187,222,251)
+        );
+
+        table.setSelectionForeground(
+                Color.BLACK
+        );
+
         table.setAutoCreateRowSorter(true);
 
-        table.getTableHeader()
-                .setReorderingAllowed(false);
+        table.setFillsViewportHeight(true);
 
         table.setSelectionMode(
                 ListSelectionModel.SINGLE_SELECTION
         );
 
-        table.setSelectionMode(
-                ListSelectionModel.SINGLE_SELECTION
+        JTableHeader header =
+                table.getTableHeader();
+
+        header.setBackground(PRIMARY);
+
+        header.setForeground(Color.WHITE);
+
+        header.setFont(
+                new Font(
+                        "Segoe UI",
+                        Font.BOLD,
+                        14
+                )
         );
+
+        header.setPreferredSize(
+                new Dimension(
+                        100,
+                        42
+                )
+        );
+
+        header.setReorderingAllowed(false);
 
         JScrollPane scrollPane =
                 new JScrollPane(table);
 
-        mainPanel.add(
-                scrollPane,
-                BorderLayout.SOUTH
+        scrollPane.setBorder(
+                BorderFactory.createCompoundBorder(
+                        new LineBorder(BORDER,1,true),
+                        new EmptyBorder(
+                                10,
+                                10,
+                                10,
+                                10
+                        )
+                )
         );
 
+        rightPanel.add(
+                scrollPane,
+                BorderLayout.CENTER
+        );
     }
 
-    /**
-     * Loads all books into JTable.
-     */
+        /*====================================================
+                    LOAD BOOKS
+    ====================================================*/
+
     private void loadBooks() {
 
         tableModel.setRowCount(0);
 
-        for (Book book :
-                bookService.findAll()) {
+        for (Book book : bookService.findAll()) {
 
             tableModel.addRow(
-
                     new Object[]{
-
                             book.getBookId(),
-
                             book.getIsbn(),
-
                             book.getTitle(),
-
-                            book.getCategory()
-                                    .getCategoryName(),
-
-                            book.getAuthor()
-                                    .getFullName(),
-
-                            book.getPublisher()
-                                    .getPublisherName(),
-
+                            book.getCategory().getCategoryName(),
+                            book.getAuthor().getFullName(),
+                            book.getPublisher().getPublisherName(),
                             book.getEdition(),
-
                             book.getLanguage(),
-
                             book.getPublishYear()
-
                     }
-
             );
 
         }
 
+        updateStatus(
+                "Total Books : " + tableModel.getRowCount()
+        );
     }
 
-    /**
-     * Clears all input fields.
-     */
+    /*====================================================
+                    CLEAR FORM
+    ====================================================*/
+
     private void clearForm() {
 
         txtIsbn.setText("");
@@ -480,90 +868,127 @@ public class BookManagementFrame extends JFrame {
 
         txtIsbn.requestFocus();
 
+        updateStatus("Ready");
     }
-    /**
-     * Register button events.
-     */
+
+    /*====================================================
+                    REGISTER EVENTS
+    ====================================================*/
+
     private void registerEvents() {
 
-        btnClear.addActionListener(
-                event -> clearForm()
-        );
+        btnAdd.addActionListener(e -> saveBook());
 
-        btnSearch.addActionListener(
-                event -> searchBook()
-        );
+        btnUpdate.addActionListener(e -> updateBook());
 
-        btnAdd.addActionListener(
-                event -> saveBook()
-        );
+        btnDelete.addActionListener(e -> deleteBook());
 
-        btnUpdate.addActionListener(
-                event -> updateBook()
-        );
+        btnSearch.addActionListener(e -> searchBook());
 
-        btnDelete.addActionListener(
-                event -> deleteBook()
-        );
+        btnClear.addActionListener(e -> clearForm());
 
+        txtSearch.addActionListener(e -> searchBook());
 
+        table.getSelectionModel().addListSelectionListener(e -> {
 
-        table.getSelectionModel()
-                .addListSelectionListener(
-                        event -> {
+            if (!e.getValueIsAdjusting()) {
 
-                            if (!event.getValueIsAdjusting()) {
+                fillFormFromTable();
 
-                                fillFormFromTable();
+            }
 
-                            }
-
-                        }
-                );
+        });
 
     }
 
-    /**
-     * Loads selected book into form.
-     */
+    /*====================================================
+                FILL FORM FROM TABLE
+    ====================================================*/
+
     private void fillFormFromTable() {
 
         int row = table.getSelectedRow();
 
         if (row == -1) {
+
             return;
+
         }
 
+        row = table.convertRowIndexToModel(row);
+
         txtIsbn.setText(
-                table.getValueAt(row, 1).toString()
+                tableModel.getValueAt(row,1).toString()
         );
 
         txtTitle.setText(
-                table.getValueAt(row, 2).toString()
+                tableModel.getValueAt(row,2).toString()
         );
 
         txtEdition.setText(
-                table.getValueAt(row, 6).toString()
+                tableModel.getValueAt(row,6).toString()
         );
 
         txtLanguage.setText(
-                table.getValueAt(row, 7).toString()
+                tableModel.getValueAt(row,7).toString()
         );
 
         txtPublishYear.setText(
-                table.getValueAt(row, 8).toString()
+                tableModel.getValueAt(row,8).toString()
+        );
+
+        updateStatus(
+                "Selected : " +
+                        tableModel.getValueAt(row,2)
         );
 
         /*
-         * ComboBox selection will be implemented
-         * after Author, Category and Publisher
-         * Management screens are completed.
-         */
+            Keep your existing logic here for selecting
+            Category, Author and Publisher objects from
+            the ComboBoxes if you already implemented it.
+        */
+
     }
 
-    /**
-     * Saves a new book.
-     */
+    /*====================================================
+                    SEARCH BOOK
+    ====================================================*/
+
+    private void searchBook() {
+
+        String keyword = txtSearch.getText().trim();
+
+        tableModel.setRowCount(0);
+
+        for (Book book : bookService.findByTitle(keyword)) {
+
+            tableModel.addRow(
+                    new Object[]{
+                            book.getBookId(),
+                            book.getIsbn(),
+                            book.getTitle(),
+                            book.getCategory().getCategoryName(),
+                            book.getAuthor().getFullName(),
+                            book.getPublisher().getPublisherName(),
+                            book.getEdition(),
+                            book.getLanguage(),
+                            book.getPublishYear()
+                    }
+            );
+
+        }
+
+        updateStatus(
+                tableModel.getRowCount()
+                        + " record(s) found."
+        );
+
+    }
+
+        /*====================================================
+                    SAVE BOOK
+    ====================================================*/
+
     private void saveBook() {
 
         try {
@@ -572,57 +997,76 @@ public class BookManagementFrame extends JFrame {
 
                 JOptionPane.showMessageDialog(
                         this,
-                        "ISBN is required."
+                        "ISBN is required.",
+                        "Validation",
+                        JOptionPane.WARNING_MESSAGE
                 );
 
                 txtIsbn.requestFocus();
                 return;
-
             }
 
             if (txtTitle.getText().trim().isEmpty()) {
 
                 JOptionPane.showMessageDialog(
                         this,
-                        "Book title is required."
+                        "Book Title is required.",
+                        "Validation",
+                        JOptionPane.WARNING_MESSAGE
                 );
 
                 txtTitle.requestFocus();
                 return;
-
             }
 
             if (cmbCategory.getSelectedItem() == null) {
 
                 JOptionPane.showMessageDialog(
                         this,
-                        "Please select a category."
+                        "Please select Category.",
+                        "Validation",
+                        JOptionPane.WARNING_MESSAGE
                 );
 
                 return;
-
             }
 
             if (cmbAuthor.getSelectedItem() == null) {
 
                 JOptionPane.showMessageDialog(
                         this,
-                        "Please select an author."
+                        "Please select Author.",
+                        "Validation",
+                        JOptionPane.WARNING_MESSAGE
                 );
 
                 return;
-
             }
 
             if (cmbPublisher.getSelectedItem() == null) {
 
                 JOptionPane.showMessageDialog(
                         this,
-                        "Please select a publisher."
+                        "Please select Publisher.",
+                        "Validation",
+                        JOptionPane.WARNING_MESSAGE
                 );
 
                 return;
+            }
 
+            if (bookService.existsByIsbn(
+                    txtIsbn.getText().trim())) {
+
+                JOptionPane.showMessageDialog(
+                        this,
+                        "ISBN already exists.",
+                        "Duplicate ISBN",
+                        JOptionPane.WARNING_MESSAGE
+                );
+
+                txtIsbn.requestFocus();
+                return;
             }
 
             Book book = new Book();
@@ -650,7 +1094,6 @@ public class BookManagementFrame extends JFrame {
                                 txtPublishYear.getText().trim()
                         )
                 );
-
             }
 
             if (!txtPages.getText().trim().isEmpty()) {
@@ -660,7 +1103,6 @@ public class BookManagementFrame extends JFrame {
                                 txtPages.getText().trim()
                         )
                 );
-
             }
 
             book.setDescription(
@@ -679,44 +1121,41 @@ public class BookManagementFrame extends JFrame {
                     (Publisher) cmbPublisher.getSelectedItem()
             );
 
-            if (bookService.existsByIsbn(book.getIsbn())) {
-
-                JOptionPane.showMessageDialog(
-                        this,
-                        "ISBN already exists."
-                );
-
-                return;
-
-            }
-
             bookService.save(book);
 
             JOptionPane.showMessageDialog(
                     this,
-                    "Book added successfully."
+                    "Book added successfully.",
+                    "Success",
+                    JOptionPane.INFORMATION_MESSAGE
             );
-
-            clearForm();
 
             loadBooks();
 
-        }
+            clearForm();
 
-        catch (NumberFormatException exception) {
-
-            JOptionPane.showMessageDialog(
-                    this,
-                    "Publish Year and Pages must be numeric."
+            updateStatus(
+                    "Book added successfully."
             );
 
         }
 
-        catch (Exception exception) {
+        catch (NumberFormatException ex) {
 
             JOptionPane.showMessageDialog(
                     this,
-                    exception.getMessage(),
+                    "Publish Year and Pages must be numeric.",
+                    "Invalid Input",
+                    JOptionPane.ERROR_MESSAGE
+            );
+
+        }
+
+        catch (Exception ex) {
+
+            JOptionPane.showMessageDialog(
+                    this,
+                    ex.getMessage(),
                     "Error",
                     JOptionPane.ERROR_MESSAGE
             );
@@ -725,55 +1164,10 @@ public class BookManagementFrame extends JFrame {
 
     }
 
+    /*====================================================
+                    UPDATE BOOK
+    ====================================================*/
 
-    /**
-     * Searches books by title.
-     */
-    private void searchBook() {
-
-        String keyword =
-                txtSearch.getText().trim();
-
-        tableModel.setRowCount(0);
-
-        for (Book book :
-                bookService.findByTitle(keyword)) {
-
-            tableModel.addRow(
-
-                    new Object[]{
-
-                            book.getBookId(),
-
-                            book.getIsbn(),
-
-                            book.getTitle(),
-
-                            book.getCategory()
-                                    .getCategoryName(),
-
-                            book.getAuthor()
-                                    .getFullName(),
-
-                            book.getPublisher()
-                                    .getPublisherName(),
-
-                            book.getEdition(),
-
-                            book.getLanguage(),
-
-                            book.getPublishYear()
-
-                    }
-
-            );
-
-        }
-
-    }
-    /**
-     * Updates the selected book.
-     */
     private void updateBook() {
 
         int row = table.getSelectedRow();
@@ -782,21 +1176,24 @@ public class BookManagementFrame extends JFrame {
 
             JOptionPane.showMessageDialog(
                     this,
-                    "Please select a book to update."
+                    "Please select a book first.",
+                    "No Selection",
+                    JOptionPane.WARNING_MESSAGE
             );
 
             return;
-
         }
+
+        row = table.convertRowIndexToModel(row);
 
         try {
 
-            Integer bookId = Integer.parseInt(
-                    table.getValueAt(row, 0).toString()
+            Integer id = Integer.parseInt(
+                    tableModel.getValueAt(row,0).toString()
             );
 
             Optional<Book> optionalBook =
-                    bookService.findById(bookId);
+                    bookService.findById(id);
 
             if (optionalBook.isEmpty()) {
 
@@ -806,26 +1203,14 @@ public class BookManagementFrame extends JFrame {
                 );
 
                 return;
-
             }
 
             Book book = optionalBook.get();
 
-            book.setIsbn(
-                    txtIsbn.getText().trim()
-            );
-
-            book.setTitle(
-                    txtTitle.getText().trim()
-            );
-
-            book.setEdition(
-                    txtEdition.getText().trim()
-            );
-
-            book.setLanguage(
-                    txtLanguage.getText().trim()
-            );
+            book.setIsbn(txtIsbn.getText().trim());
+            book.setTitle(txtTitle.getText().trim());
+            book.setEdition(txtEdition.getText().trim());
+            book.setLanguage(txtLanguage.getText().trim());
 
             if (!txtPublishYear.getText().trim().isEmpty()) {
 
@@ -867,38 +1252,48 @@ public class BookManagementFrame extends JFrame {
 
                 JOptionPane.showMessageDialog(
                         this,
-                        "Book updated successfully."
+                        "Book updated successfully.",
+                        "Success",
+                        JOptionPane.INFORMATION_MESSAGE
                 );
+
+                loadBooks();
 
                 clearForm();
 
-                loadBooks();
+                updateStatus(
+                        "Book updated successfully."
+                );
 
             } else {
 
                 JOptionPane.showMessageDialog(
                         this,
-                        "Book update failed."
+                        "Unable to update book.",
+                        "Failed",
+                        JOptionPane.ERROR_MESSAGE
                 );
 
             }
 
         }
 
-        catch (NumberFormatException exception) {
+        catch (NumberFormatException ex) {
 
             JOptionPane.showMessageDialog(
                     this,
-                    "Publish Year and Pages must be numeric."
+                    "Publish Year and Pages must be numeric.",
+                    "Invalid Input",
+                    JOptionPane.ERROR_MESSAGE
             );
 
         }
 
-        catch (Exception exception) {
+        catch (Exception ex) {
 
             JOptionPane.showMessageDialog(
                     this,
-                    exception.getMessage(),
+                    ex.getMessage(),
                     "Error",
                     JOptionPane.ERROR_MESSAGE
             );
@@ -906,10 +1301,10 @@ public class BookManagementFrame extends JFrame {
         }
 
     }
+        /*====================================================
+                    DELETE BOOK
+    ====================================================*/
 
-    /**
-     * Deletes the selected book.
-     */
     private void deleteBook() {
 
         int row = table.getSelectedRow();
@@ -918,106 +1313,103 @@ public class BookManagementFrame extends JFrame {
 
             JOptionPane.showMessageDialog(
                     this,
-                    "Please select a book to delete."
+                    "Please select a book to delete.",
+                    "No Selection",
+                    JOptionPane.WARNING_MESSAGE
             );
 
             return;
-
         }
 
+        row = table.convertRowIndexToModel(row);
+
         int choice = JOptionPane.showConfirmDialog(
-
                 this,
-
                 "Are you sure you want to delete this book?",
-
                 "Confirm Delete",
-
                 JOptionPane.YES_NO_OPTION,
-
                 JOptionPane.WARNING_MESSAGE
-
         );
 
         if (choice != JOptionPane.YES_OPTION) {
 
             return;
-
         }
 
         try {
 
             Integer bookId = Integer.parseInt(
-
-                    table.getValueAt(row, 0).toString()
-
+                    tableModel.getValueAt(row,0).toString()
             );
 
             if (bookService.delete(bookId)) {
 
                 JOptionPane.showMessageDialog(
-
                         this,
-
-                        "Book deleted successfully."
-
+                        "Book deleted successfully.",
+                        "Success",
+                        JOptionPane.INFORMATION_MESSAGE
                 );
-
-                clearForm();
 
                 loadBooks();
 
-            }
+                clearForm();
 
-            else {
+                updateStatus(
+                        "Book deleted successfully."
+                );
+
+            } else {
 
                 JOptionPane.showMessageDialog(
-
                         this,
-
-                        "Unable to delete book."
-
+                        "Unable to delete book.",
+                        "Delete Failed",
+                        JOptionPane.ERROR_MESSAGE
                 );
 
             }
 
         }
 
-        catch (Exception exception) {
+        catch (Exception ex) {
 
             JOptionPane.showMessageDialog(
-
                     this,
-
-                    exception.getMessage(),
-
+                    ex.getMessage(),
                     "Error",
-
                     JOptionPane.ERROR_MESSAGE
-
             );
 
         }
 
     }
-        private void loadCategories() {
 
-            cmbCategory.removeAllItems();
+    /*====================================================
+                    LOAD CATEGORIES
+    ====================================================*/
 
-            for (Category category :
-                    categoryService.findAll()) {
+    private void loadCategories() {
 
-                cmbCategory.addItem(category);
+        cmbCategory.removeAllItems();
 
-            }
+        for (Category category : categoryService.findAll()) {
+
+            cmbCategory.addItem(category);
 
         }
+
+    }
+
+    /*====================================================
+                    LOAD AUTHORS
+    ====================================================*/
+
     private void loadAuthors() {
 
         cmbAuthor.removeAllItems();
 
-        for (Author author :
-                authorService.findAll()) {
+        for (Author author : authorService.findAll()) {
 
             cmbAuthor.addItem(author);
 
@@ -1025,18 +1417,26 @@ public class BookManagementFrame extends JFrame {
 
     }
 
+    /*====================================================
+                    LOAD PUBLISHERS
+    ====================================================*/
+
     private void loadPublishers() {
 
         cmbPublisher.removeAllItems();
 
-        for (Publisher publisher :
-                publisherService.findAll()) {
+        for (Publisher publisher : publisherService.findAll()) {
 
             cmbPublisher.addItem(publisher);
 
         }
 
     }
+
+    /*====================================================
+                    WINDOW ENTRY POINT
+    ====================================================*/
+
     public static void main(String[] args) {
 
         SwingUtilities.invokeLater(() -> {
@@ -1050,7 +1450,7 @@ public class BookManagementFrame extends JFrame {
             } catch (Exception ignored) {
             }
 
-            new BookManagementFrame().setVisible(true);
+            new BookManagementFrame();
 
         });
 

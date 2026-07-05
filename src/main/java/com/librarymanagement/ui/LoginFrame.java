@@ -11,6 +11,7 @@ import javax.swing.border.EmptyBorder;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.util.Optional;
+import com.formdev.flatlaf.FlatLightLaf;
 
 /**
  * Login Screen for Library Management System.
@@ -344,9 +345,7 @@ public class LoginFrame extends JFrame {
 
                     try {
 
-                        UIManager.setLookAndFeel(
-                                UIManager.getSystemLookAndFeelClassName()
-                        );
+                        FlatLightLaf.setup();
 
                     } catch (Exception ignored) {
                     }

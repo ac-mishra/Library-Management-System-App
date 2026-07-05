@@ -76,5 +76,8 @@ public class Publisher {
     public void setCreatedAt(LocalDateTime createdAt) {
         this.createdAt = createdAt;
     }
-
+    @Override
+    public String toString() {
+        return publisherName;
+    }
 }

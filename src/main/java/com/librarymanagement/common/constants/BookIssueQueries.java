@@ -2,9 +2,8 @@ package com.librarymanagement.common.constants;
 
 /**
  * SQL Queries for Book Issue.
- *
  * @author Amrit Chandan Mishra
- * @version 1.0.0
+ * @version 2.0.0
  */
 public final class BookIssueQueries {
 
@@ -24,7 +23,9 @@ public final class BookIssueQueries {
                 status
             )
             VALUES
-            (?,?,?,?,?,?,?,?)
+            (
+                ?, ?, ?, ?, ?, ?, ?, ?
+            )
             """;
 
     public static final String UPDATE = """
@@ -47,44 +48,99 @@ public final class BookIssueQueries {
             """;
 
     public static final String FIND_BY_ID = """
-            SELECT *
-            FROM book_issues
-            WHERE issue_id=?
+            SELECT
+                bi.*,
+                b.title,
+                b.isbn,
+                m.first_name,
+                m.last_name
+            FROM book_issues bi
+            INNER JOIN books b
+                    ON bi.book_id = b.book_id
+            INNER JOIN members m
+                    ON bi.member_id = m.member_id
+            WHERE bi.issue_id=?
             """;
 
     public static final String FIND_ALL = """
-            SELECT *
-            FROM book_issues
-            ORDER BY issue_date DESC
+            SELECT
+                bi.*,
+                b.title,
+                b.isbn,
+                m.first_name,
+                m.last_name
+            FROM book_issues bi
+            INNER JOIN books b
+                    ON bi.book_id = b.book_id
+            INNER JOIN members m
+                    ON bi.member_id = m.member_id
+            ORDER BY bi.issue_date DESC
             """;
 
     public static final String FIND_ACTIVE = """
-            SELECT *
-            FROM book_issues
-            WHERE status='ISSUED'
-            ORDER BY issue_date DESC
+            SELECT
+                bi.*,
+                b.title,
+                b.isbn,
+                m.first_name,
+                m.last_name
+            FROM book_issues bi
+            INNER JOIN books b
+                    ON bi.book_id = b.book_id
+            INNER JOIN members m
+                    ON bi.member_id = m.member_id
+            WHERE bi.status='ISSUED'
+            ORDER BY bi.issue_date DESC
             """;
 
     public static final String FIND_BY_MEMBER = """
-            SELECT *
-            FROM book_issues
-            WHERE member_id=?
-            ORDER BY issue_date DESC
+            SELECT
+                bi.*,
+                b.title,
+                b.isbn,
+                m.first_name,
+                m.last_name
+            FROM book_issues bi
+            INNER JOIN books b
+                    ON bi.book_id = b.book_id
+            INNER JOIN members m
+                    ON bi.member_id = m.member_id
+            WHERE bi.member_id=?
+            ORDER BY bi.issue_date DESC
             """;
 
     public static final String FIND_BY_BOOK = """
-            SELECT *
-            FROM book_issues
-            WHERE book_id=?
-            ORDER BY issue_date DESC
+            SELECT
+                bi.*,
+                b.title,
+                b.isbn,
+                m.first_name,
+                m.last_name
+            FROM book_issues bi
+            INNER JOIN books b
+                    ON bi.book_id = b.book_id
+            INNER JOIN members m
+                    ON bi.member_id = m.member_id
+            WHERE bi.book_id=?
+            ORDER BY bi.issue_date DESC
             """;
 
     public static final String FIND_ACTIVE_ISSUE = """
-            SELECT *
-            FROM book_issues
-            WHERE member_id=?
-            AND book_id=?
-            AND status='ISSUED'
+            SELECT
+                bi.*,
+                b.title,
+                b.isbn,
+                m.first_name,
+                m.last_name
+            FROM book_issues bi
+            INNER JOIN books b
+                    ON bi.book_id = b.book_id
+            INNER JOIN members m
+                    ON bi.member_id = m.member_id
+            WHERE bi.member_id=?
+              AND bi.book_id=?
+              AND bi.status='ISSUED'
+            LIMIT 1
             """;
 
 }

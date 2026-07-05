@@ -1,25 +1,25 @@
-package com.librarymanagement.ui.members;
+package com.librarymanagement.ui.publishers;
 
-import com.librarymanagement.entity.Member;
-import com.librarymanagement.service.MemberService;
-import com.librarymanagement.service.impl.MemberServiceImpl;
-import com.toedter.calendar.JDateChooser;
+import com.librarymanagement.entity.Publisher;
+import com.librarymanagement.service.PublisherService;
+import com.librarymanagement.service.impl.PublisherServiceImpl;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.LineBorder;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
-import java.time.ZoneId;
-import java.util.Optional;
 
-public class MemberManagementFrame extends JFrame {
+public class PublisherManagementFrame extends JFrame {
 
-    private static final Color PRIMARY = new Color(25,118,210);
-    private static final Color SUCCESS = new Color(46,125,50);
-    private static final Color DANGER = new Color(198,40,40);
-    private static final Color GRAY = new Color(97,97,97);
-    private static final Color BG = new Color(245,247,250);
+    private static final Color PRIMARY =
+            new Color(25,118,210);
+
+    private static final Color BACKGROUND =
+            new Color(245,247,250);
+
+    private static final Color BORDER =
+            new Color(220,220,220);
 
     private static final Font TITLE_FONT =
             new Font("Segoe UI",Font.BOLD,28);
@@ -31,26 +31,14 @@ public class MemberManagementFrame extends JFrame {
             new Font("Segoe UI",Font.PLAIN,14);
 
     private JPanel rootPanel;
+    private JPanel centerPanel;
     private JPanel leftPanel;
     private JPanel rightPanel;
     private JPanel searchPanel;
     private JPanel buttonPanel;
 
-    private JTextField txtMemberCode =
+    private JTextField txtPublisherName =
             new JTextField();
-
-    private JTextField txtFirstName =
-            new JTextField();
-
-    private JTextField txtLastName =
-            new JTextField();
-
-    private JComboBox<String> cmbGender =
-            new JComboBox<>(new String[]{
-                    "Male",
-                    "Female",
-                    "Other"
-            });
 
     private JTextField txtEmail =
             new JTextField();
@@ -58,20 +46,11 @@ public class MemberManagementFrame extends JFrame {
     private JTextField txtPhone =
             new JTextField();
 
+    private JTextField txtWebsite =
+            new JTextField();
+
     private JTextArea txtAddress =
             new JTextArea();
-
-    private JDateChooser dcDob =
-            new JDateChooser();
-
-    private JDateChooser dcJoinDate =
-            new JDateChooser();
-
-    private JComboBox<String> cmbStatus =
-            new JComboBox<>(new String[]{
-                    "ACTIVE",
-                    "INACTIVE"
-            });
 
     private JTextField txtSearch =
             new JTextField();
@@ -95,10 +74,10 @@ public class MemberManagementFrame extends JFrame {
 
     private DefaultTableModel tableModel;
 
-    private final MemberService memberService =
-            new MemberServiceImpl();
+    private final PublisherService publisherService =
+            new PublisherServiceImpl();
 
-    public MemberManagementFrame(){
+    public PublisherManagementFrame() {
 
         initializeUI();
 
@@ -106,17 +85,17 @@ public class MemberManagementFrame extends JFrame {
 
         registerEvents();
 
-        loadMembers();
+        loadPublishers();
 
         setVisible(true);
 
     }
 
-    private void initializeUI(){
+    private void initializeUI() {
 
-        setTitle("Library Management System - Member Management");
+        setTitle("Publisher Management");
 
-        setSize(1500,900);
+        setSize(1450,850);
 
         setLocationRelativeTo(null);
 
@@ -124,13 +103,10 @@ public class MemberManagementFrame extends JFrame {
 
         rootPanel =
                 new JPanel(
-                        new BorderLayout(
-                                20,
-                                20
-                        )
+                        new BorderLayout(15,15)
                 );
 
-        rootPanel.setBackground(BG);
+        rootPanel.setBackground(BACKGROUND);
 
         rootPanel.setBorder(
                 new EmptyBorder(
@@ -149,7 +125,7 @@ public class MemberManagementFrame extends JFrame {
 
     }
 
-    private void createHeader(){
+    private void createHeader() {
 
         JPanel header =
                 new JPanel(
@@ -169,7 +145,7 @@ public class MemberManagementFrame extends JFrame {
 
         JLabel title =
                 new JLabel(
-                        "👥 MEMBER MANAGEMENT"
+                        "🏢 PUBLISHER MANAGEMENT"
                 );
 
         title.setForeground(Color.WHITE);
@@ -207,9 +183,10 @@ public class MemberManagementFrame extends JFrame {
         );
 
     }
-    private void createCenterLayout(){
 
-        JPanel center =
+    private void createCenterLayout() {
+
+        centerPanel =
                 new JPanel(
                         new BorderLayout(
                                 20,
@@ -217,9 +194,10 @@ public class MemberManagementFrame extends JFrame {
                         )
                 );
 
-        center.setOpaque(false);
+        centerPanel.setOpaque(false);
 
-        leftPanel = createFormPanel();
+        leftPanel =
+                createFormPanel();
 
         rightPanel =
                 new JPanel(
@@ -238,55 +216,52 @@ public class MemberManagementFrame extends JFrame {
                 BorderLayout.NORTH
         );
 
-        center.add(
+        centerPanel.add(
                 leftPanel,
                 BorderLayout.WEST
         );
 
-        center.add(
+        centerPanel.add(
                 rightPanel,
                 BorderLayout.CENTER
         );
 
         rootPanel.add(
-                center,
+                centerPanel,
                 BorderLayout.CENTER
         );
 
     }
 
-    private JPanel createFormPanel(){
+    private JPanel createFormPanel() {
 
         JPanel panel =
                 new JPanel(
                         new GridBagLayout()
                 );
 
-        panel.setBackground(Color.WHITE);
-
         panel.setPreferredSize(
                 new Dimension(
-                        450,
-                        700
+                        420,
+                        650
                 )
         );
 
+        panel.setBackground(Color.WHITE);
+
         panel.setBorder(
                 BorderFactory.createCompoundBorder(
-
                         new LineBorder(
-                                new Color(220,220,220),
+                                BORDER,
                                 1,
                                 true
                         ),
-
                         new EmptyBorder(
                                 20,
                                 20,
                                 20,
                                 20
                         )
-
                 )
         );
 
@@ -308,19 +283,15 @@ public class MemberManagementFrame extends JFrame {
 
         int row = 0;
 
-        addField(panel,gbc,row++,"Member Code",txtMemberCode);
-
-        addField(panel,gbc,row++,"First Name",txtFirstName);
-
-        addField(panel,gbc,row++,"Last Name",txtLastName);
-
-        addField(panel,gbc,row++,"Gender",cmbGender);
+        addField(panel,gbc,row++,"Publisher Name",txtPublisherName);
 
         addField(panel,gbc,row++,"Email",txtEmail);
 
         addField(panel,gbc,row++,"Phone",txtPhone);
 
-        txtAddress.setRows(4);
+        addField(panel,gbc,row++,"Website",txtWebsite);
+
+        txtAddress.setRows(5);
 
         txtAddress.setLineWrap(true);
 
@@ -328,39 +299,20 @@ public class MemberManagementFrame extends JFrame {
 
         txtAddress.setFont(FIELD_FONT);
 
-        JScrollPane addressScroll =
+        JScrollPane address =
                 new JScrollPane(txtAddress);
 
-        addField(
-                panel,
-                gbc,
-                row++,
-                "Address",
-                addressScroll
-        );
-
-        dcDob.setDateFormatString("dd-MM-yyyy");
-
-        dcJoinDate.setDateFormatString("dd-MM-yyyy");
-
-        addField(panel,gbc,row++,"Date Of Birth",dcDob);
-
-        addField(panel,gbc,row++,"Join Date",dcJoinDate);
-
-        addField(panel,gbc,row++,"Status",cmbStatus);
+        addField(panel,gbc,row++,"Address",address);
 
         createButtonPanel();
 
-        gbc.gridx = 0;
+        gbc.gridx=0;
 
-        gbc.gridy = row;
+        gbc.gridy=row;
 
-        gbc.gridwidth = 2;
+        gbc.gridwidth=2;
 
-        panel.add(
-                buttonPanel,
-                gbc
-        );
+        panel.add(buttonPanel,gbc);
 
         return panel;
 
@@ -378,16 +330,13 @@ public class MemberManagementFrame extends JFrame {
 
         lbl.setFont(LABEL_FONT);
 
-        gbc.gridx = 0;
+        gbc.gridx=0;
 
-        gbc.gridy = row;
+        gbc.gridy=row;
 
-        gbc.weightx = 0;
+        gbc.weightx=0;
 
-        panel.add(
-                lbl,
-                gbc
-        );
+        panel.add(lbl,gbc);
 
         if(component instanceof JTextField field){
 
@@ -402,14 +351,11 @@ public class MemberManagementFrame extends JFrame {
 
         }
 
-        gbc.gridx = 1;
+        gbc.gridx=1;
 
-        gbc.weightx = 1;
+        gbc.weightx=1;
 
-        panel.add(
-                component,
-                gbc
-        );
+        panel.add(component,gbc);
 
     }
 
@@ -428,26 +374,23 @@ public class MemberManagementFrame extends JFrame {
 
         searchPanel.setBorder(
                 BorderFactory.createCompoundBorder(
-
                         new LineBorder(
-                                new Color(220,220,220),
+                                BORDER,
                                 1,
                                 true
                         ),
-
                         new EmptyBorder(
                                 10,
                                 10,
                                 10,
                                 10
                         )
-
                 )
         );
 
         JLabel lbl =
                 new JLabel(
-                        "🔍 Search Member"
+                        "🔍 Search Publisher"
                 );
 
         lbl.setFont(
@@ -461,7 +404,7 @@ public class MemberManagementFrame extends JFrame {
         txtSearch.setPreferredSize(
                 new Dimension(
                         300,
-                        40
+                        38
                 )
         );
 
@@ -474,28 +417,20 @@ public class MemberManagementFrame extends JFrame {
         styleButtons();
 
     }
+
     private void createButtonPanel() {
 
         buttonPanel = new JPanel(
-                new GridLayout(
-                        3,
-                        2,
-                        12,
-                        12
-                )
+                new GridLayout(3,2,12,12)
         );
 
         buttonPanel.setOpaque(false);
 
-        styleButton(btnAdd, SUCCESS);
-
-        styleButton(btnUpdate, PRIMARY);
-
-        styleButton(btnDelete, DANGER);
-
-        styleButton(btnClear, GRAY);
-
-        styleButton(btnSearch, PRIMARY);
+        styleButton(btnAdd,new Color(46,125,50));
+        styleButton(btnUpdate,PRIMARY);
+        styleButton(btnDelete,new Color(211,47,47));
+        styleButton(btnClear,new Color(97,97,97));
+        styleButton(btnSearch,new Color(21,101,192));
 
         JButton btnRefresh =
                 new JButton("🔄 Refresh");
@@ -507,37 +442,32 @@ public class MemberManagementFrame extends JFrame {
 
         btnRefresh.addActionListener(e -> {
 
+            txtSearch.setText("");
+
             clearForm();
 
-            loadMembers();
+            loadPublishers();
 
         });
 
         buttonPanel.add(btnAdd);
-
         buttonPanel.add(btnUpdate);
 
         buttonPanel.add(btnDelete);
-
         buttonPanel.add(btnClear);
 
         buttonPanel.add(btnSearch);
-
         buttonPanel.add(btnRefresh);
 
     }
 
     private void styleButtons() {
 
-        styleButton(btnAdd,SUCCESS);
-
+        styleButton(btnAdd,new Color(46,125,50));
         styleButton(btnUpdate,PRIMARY);
-
-        styleButton(btnDelete,DANGER);
-
-        styleButton(btnClear,GRAY);
-
-        styleButton(btnSearch,PRIMARY);
+        styleButton(btnDelete,new Color(211,47,47));
+        styleButton(btnClear,new Color(97,97,97));
+        styleButton(btnSearch,new Color(21,101,192));
 
     }
 
@@ -553,9 +483,9 @@ public class MemberManagementFrame extends JFrame {
                 )
         );
 
-        button.setBackground(color);
-
         button.setForeground(Color.WHITE);
+
+        button.setBackground(color);
 
         button.setFocusPainted(false);
 
@@ -582,23 +512,11 @@ public class MemberManagementFrame extends JFrame {
                 new DefaultTableModel(
 
                         new Object[]{
-
                                 "ID",
-
-                                "Member Code",
-
-                                "First Name",
-
-                                "Last Name",
-
-                                "Gender",
-
+                                "Publisher Name",
                                 "Email",
-
                                 "Phone",
-
-                                "Status"
-
+                                "Website"
                         },
 
                         0
@@ -624,36 +542,21 @@ public class MemberManagementFrame extends JFrame {
 
         table.setRowHeight(36);
 
-        table.setShowGrid(false);
-
-        table.setIntercellSpacing(
-                new Dimension(
-                        0,
-                        0
-                )
-        );
-
         table.setSelectionBackground(
-                new Color(
-                        220,
-                        235,
-                        252
-                )
+                new Color(220,235,252)
         );
 
         table.setSelectionForeground(
                 Color.BLACK
         );
 
+        table.setShowVerticalLines(false);
+
         table.setAutoCreateRowSorter(true);
 
         table.setSelectionMode(
                 ListSelectionModel.SINGLE_SELECTION
         );
-
-        table.getTableHeader().setBackground(PRIMARY);
-
-        table.getTableHeader().setForeground(Color.WHITE);
 
         table.getTableHeader().setFont(
                 new Font(
@@ -663,25 +566,18 @@ public class MemberManagementFrame extends JFrame {
                 )
         );
 
-        table.getTableHeader().setPreferredSize(
-                new Dimension(
-                        0,
-                        40
-                )
-        );
+        table.getTableHeader().setBackground(PRIMARY);
 
-        JScrollPane scrollPane =
+        table.getTableHeader().setForeground(Color.WHITE);
+
+        JScrollPane scroll =
                 new JScrollPane(table);
 
-        scrollPane.setBorder(
+        scroll.setBorder(
                 BorderFactory.createCompoundBorder(
 
                         new LineBorder(
-                                new Color(
-                                        220,
-                                        220,
-                                        220
-                                ),
+                                BORDER,
                                 1,
                                 true
                         ),
@@ -697,7 +593,7 @@ public class MemberManagementFrame extends JFrame {
         );
 
         rightPanel.add(
-                scrollPane,
+                scroll,
                 BorderLayout.CENTER
         );
 
@@ -705,67 +601,47 @@ public class MemberManagementFrame extends JFrame {
 
     private void registerEvents(){
 
-        btnAdd.addActionListener(
-                e -> saveMember()
-        );
+        btnAdd.addActionListener(e -> savePublisher());
 
-        btnUpdate.addActionListener(
-                e -> updateMember()
-        );
+        btnUpdate.addActionListener(e -> updatePublisher());
 
-        btnDelete.addActionListener(
-                e -> deleteMember()
-        );
+        btnDelete.addActionListener(e -> deletePublisher());
 
-        btnClear.addActionListener(
-                e -> clearForm()
-        );
+        btnClear.addActionListener(e -> clearForm());
 
-        btnSearch.addActionListener(
-                e -> searchMember()
-        );
+        btnSearch.addActionListener(e -> searchPublisher());
 
-        txtSearch.addActionListener(
-                e -> searchMember()
-        );
+        txtSearch.addActionListener(e -> searchPublisher());
 
         table.getSelectionModel()
-                .addListSelectionListener(
-                        e -> {
+                .addListSelectionListener(e -> {
 
-                            if(!e.getValueIsAdjusting()){
+                    if(!e.getValueIsAdjusting()){
 
-                                fillFormFromTable();
+                        fillFormFromTable();
 
-                            }
+                    }
 
-                        }
-                );
+                });
 
     }
-    private void loadMembers() {
+    private void loadPublishers() {
 
         tableModel.setRowCount(0);
 
-        for (Member member : memberService.findAll()) {
+        for (Publisher publisher : publisherService.findAll()) {
 
             tableModel.addRow(new Object[]{
 
-                    member.getMemberId(),
+                    publisher.getPublisherId(),
 
-                    member.getMemberCode(),
+                    publisher.getPublisherName(),
 
-                    member.getFirstName(),
+                    publisher.getEmail(),
 
-                    member.getLastName(),
+                    publisher.getPhone(),
 
-                    member.getGender(),
-
-                    member.getEmail(),
-
-                    member.getPhone(),
-
-                    member.getMembershipStatus()
+                    publisher.getWebsite()
 
             });
 
@@ -773,134 +649,70 @@ public class MemberManagementFrame extends JFrame {
 
     }
 
-    private void saveMember() {
+    private void savePublisher() {
 
         try {
 
-            if (txtMemberCode.getText().trim().isEmpty()) {
+            if (txtPublisherName.getText().trim().isEmpty()) {
 
                 JOptionPane.showMessageDialog(
                         this,
-                        "Member Code is required."
+                        "Publisher Name is required."
                 );
 
-                txtMemberCode.requestFocus();
+                txtPublisherName.requestFocus();
 
                 return;
 
             }
 
-            if (txtFirstName.getText().trim().isEmpty()) {
+            Publisher publisher = new Publisher();
 
-                JOptionPane.showMessageDialog(
-                        this,
-                        "First Name is required."
-                );
-
-                txtFirstName.requestFocus();
-
-                return;
-
-            }
-
-            if (memberService.existsByMemberCode(
-                    txtMemberCode.getText().trim())) {
-
-                JOptionPane.showMessageDialog(
-                        this,
-                        "Member Code already exists."
-                );
-
-                return;
-
-            }
-
-            Member member = new Member();
-
-            member.setMemberCode(
-                    txtMemberCode.getText().trim()
+            publisher.setPublisherName(
+                    txtPublisherName.getText().trim()
             );
 
-            member.setFirstName(
-                    txtFirstName.getText().trim()
-            );
-
-            member.setLastName(
-                    txtLastName.getText().trim()
-            );
-
-            member.setGender(
-                    cmbGender.getSelectedItem().toString()
-            );
-
-            member.setEmail(
+            publisher.setEmail(
                     txtEmail.getText().trim()
             );
 
-            member.setPhone(
+            publisher.setPhone(
                     txtPhone.getText().trim()
             );
 
-            member.setAddress(
+            publisher.setAddress(
                     txtAddress.getText().trim()
             );
 
-            if (dcDob.getDate() != null) {
-
-                member.setDateOfBirth(
-                        dcDob.getDate()
-                                .toInstant()
-                                .atZone(ZoneId.systemDefault())
-                                .toLocalDate()
-                );
-
-            }
-
-            if (dcJoinDate.getDate() != null) {
-
-                member.setJoinDate(
-                        dcJoinDate.getDate()
-                                .toInstant()
-                                .atZone(ZoneId.systemDefault())
-                                .toLocalDate()
-                );
-
-            }
-
-            member.setMembershipStatus(
-                    cmbStatus.getSelectedItem().toString()
+            publisher.setWebsite(
+                    txtWebsite.getText().trim()
             );
 
-            memberService.save(member);
+            publisherService.save(publisher);
 
             JOptionPane.showMessageDialog(
                     this,
-                    "Member added successfully."
+                    "Publisher added successfully."
             );
 
             clearForm();
 
-            loadMembers();
+            loadPublishers();
 
         } catch (Exception exception) {
 
             JOptionPane.showMessageDialog(
-
                     this,
-
                     exception.getMessage(),
-
                     "Error",
-
                     JOptionPane.ERROR_MESSAGE
-
             );
 
         }
 
     }
 
-    private void updateMember() {
+    private void updatePublisher() {
 
         int row = table.getSelectedRow();
 
@@ -908,7 +720,7 @@ public class MemberManagementFrame extends JFrame {
 
             JOptionPane.showMessageDialog(
                     this,
-                    "Please select a member."
+                    "Please select a publisher."
             );
 
             return;
@@ -917,105 +729,67 @@ public class MemberManagementFrame extends JFrame {
 
         row = table.convertRowIndexToModel(row);
 
-        Integer memberId = Integer.parseInt(
-                tableModel.getValueAt(
-                        row,
-                        0
-                ).toString()
+        Integer id = Integer.parseInt(
+                tableModel.getValueAt(row,0).toString()
         );
 
-        Optional<Member> optional =
-                memberService.findById(memberId);
+        Publisher publisher =
+                publisherService.findById(id).orElse(null);
 
-        if (optional.isEmpty()) {
+        if (publisher == null) {
 
             JOptionPane.showMessageDialog(
                     this,
-                    "Member not found."
+                    "Publisher not found."
             );
 
             return;
 
         }
 
-        Member member = optional.get();
-
-        member.setMemberCode(
-                txtMemberCode.getText().trim()
+        publisher.setPublisherName(
+                txtPublisherName.getText().trim()
         );
 
-        member.setFirstName(
-                txtFirstName.getText().trim()
-        );
-
-        member.setLastName(
-                txtLastName.getText().trim()
-        );
-
-        member.setGender(
-                cmbGender.getSelectedItem().toString()
-        );
-
-        member.setEmail(
+        publisher.setEmail(
                 txtEmail.getText().trim()
         );
 
-        member.setPhone(
+        publisher.setPhone(
                 txtPhone.getText().trim()
         );
 
-        member.setAddress(
+        publisher.setAddress(
                 txtAddress.getText().trim()
         );
 
-        if (dcDob.getDate() != null) {
-
-            member.setDateOfBirth(
-                    dcDob.getDate()
-                            .toInstant()
-                            .atZone(ZoneId.systemDefault())
-                            .toLocalDate()
-            );
-
-        }
-
-        if (dcJoinDate.getDate() != null) {
-
-            member.setJoinDate(
-                    dcJoinDate.getDate()
-                            .toInstant()
-                            .atZone(ZoneId.systemDefault())
-                            .toLocalDate()
-            );
-
-        }
-
-        member.setMembershipStatus(
-                cmbStatus.getSelectedItem().toString()
+        publisher.setWebsite(
+                txtWebsite.getText().trim()
         );
 
-        if (memberService.update(member)) {
+        if (publisherService.update(publisher)) {
 
             JOptionPane.showMessageDialog(
                     this,
-                    "Member updated successfully."
+                    "Publisher updated successfully."
             );
 
             clearForm();
 
-            loadMembers();
+            loadPublishers();
 
         } else {
 
             JOptionPane.showMessageDialog(
                     this,
-                    "Unable to update member."
+                    "Unable to update publisher."
             );
 
         }
 
     }
-    private void deleteMember() {
+
+    private void deletePublisher() {
 
         int row = table.getSelectedRow();
 
@@ -1023,7 +797,7 @@ public class MemberManagementFrame extends JFrame {
 
             JOptionPane.showMessageDialog(
                     this,
-                    "Please select a member."
+                    "Please select a publisher."
             );
 
             return;
@@ -1032,17 +806,19 @@ public class MemberManagementFrame extends JFrame {
 
         row = table.convertRowIndexToModel(row);
 
+        Integer id = Integer.parseInt(
+                tableModel.getValueAt(row,0).toString()
+        );
+
         int option = JOptionPane.showConfirmDialog(
 
                 this,
 
-                "Delete selected member?",
+                "Delete selected publisher?",
 
                 "Confirm Delete",
 
-                JOptionPane.YES_NO_OPTION,
-
-                JOptionPane.WARNING_MESSAGE
+                JOptionPane.YES_NO_OPTION
 
         );
 
@@ -1052,33 +828,29 @@ public class MemberManagementFrame extends JFrame {
 
         }
 
-        Integer memberId = Integer.parseInt(
-                tableModel.getValueAt(row,0).toString()
-        );
-
-        if (memberService.delete(memberId)) {
+        if (publisherService.delete(id)) {
 
             JOptionPane.showMessageDialog(
                     this,
-                    "Member deleted successfully."
+                    "Publisher deleted successfully."
             );
 
             clearForm();
 
-            loadMembers();
+            loadPublishers();
 
         } else {
 
             JOptionPane.showMessageDialog(
                     this,
-                    "Unable to delete member."
+                    "Unable to delete publisher."
             );
 
         }
 
     }
 
-    private void searchMember() {
+    private void searchPublisher() {
 
         String keyword =
                 txtSearch.getText()
@@ -1087,31 +859,23 @@ public class MemberManagementFrame extends JFrame {
 
         tableModel.setRowCount(0);
 
-        for (Member member : memberService.findAll()) {
+        for (Publisher publisher : publisherService.findAll()) {
 
-            if (member.getMemberCode().toLowerCase().contains(keyword)
-                    || member.getFirstName().toLowerCase().contains(keyword)
-                    || member.getLastName().toLowerCase().contains(keyword)
-                    || member.getEmail().toLowerCase().contains(keyword)
-                    || member.getPhone().toLowerCase().contains(keyword)) {
+            if (publisher.getPublisherName()
+                    .toLowerCase()
+                    .contains(keyword)) {
 
                 tableModel.addRow(new Object[]{
 
-                        member.getMemberId(),
+                        publisher.getPublisherId(),
 
-                        member.getMemberCode(),
+                        publisher.getPublisherName(),
 
-                        member.getFirstName(),
+                        publisher.getEmail(),
 
-                        member.getLastName(),
+                        publisher.getPhone(),
 
-                        member.getGender(),
-
-                        member.getEmail(),
-
-                        member.getPhone(),
-
-                        member.getMembershipStatus()
+                        publisher.getWebsite()
 
                 });
 
@@ -1133,92 +897,44 @@ public class MemberManagementFrame extends JFrame {
 
         row = table.convertRowIndexToModel(row);
 
-        Integer memberId = Integer.parseInt(
+        Integer id = Integer.parseInt(
                 tableModel.getValueAt(row,0).toString()
         );
 
-        Optional<Member> optional =
-                memberService.findById(memberId);
+        Publisher publisher =
+                publisherService.findById(id).orElse(null);
 
-        if (optional.isEmpty()) {
+        if (publisher == null) {
 
             return;
 
         }
 
-        Member member = optional.get();
-
-        txtMemberCode.setText(
-                member.getMemberCode()
-        );
-
-        txtFirstName.setText(
-                member.getFirstName()
-        );
-
-        txtLastName.setText(
-                member.getLastName()
-        );
-
-        cmbGender.setSelectedItem(
-                member.getGender()
+        txtPublisherName.setText(
+                publisher.getPublisherName()
         );
 
         txtEmail.setText(
-                member.getEmail()
+                publisher.getEmail()
         );
 
         txtPhone.setText(
-                member.getPhone()
+                publisher.getPhone()
         );
 
         txtAddress.setText(
-                member.getAddress()
+                publisher.getAddress()
         );
 
-        if (member.getDateOfBirth() != null) {
-
-            dcDob.setDate(
-                    java.sql.Date.valueOf(
-                            member.getDateOfBirth()
-                    )
-            );
-
-        } else {
-
-            dcDob.setDate(null);
-
-        }
-
-        if (member.getJoinDate() != null) {
-
-            dcJoinDate.setDate(
-                    java.sql.Date.valueOf(
-                            member.getJoinDate()
-                    )
-            );
-
-        } else {
-
-            dcJoinDate.setDate(null);
-
-        }
-
-        cmbStatus.setSelectedItem(
-                member.getMembershipStatus()
+        txtWebsite.setText(
+                publisher.getWebsite()
         );
 
     }
 
     private void clearForm() {
 
-        txtMemberCode.setText("");
-
-        txtFirstName.setText("");
-
-        txtLastName.setText("");
-
-        cmbGender.setSelectedIndex(0);
+        txtPublisherName.setText("");
 
         txtEmail.setText("");
 
@@ -1226,17 +942,13 @@ public class MemberManagementFrame extends JFrame {
 
         txtAddress.setText("");
 
-        dcDob.setDate(null);
-
-        dcJoinDate.setDate(null);
-
-        cmbStatus.setSelectedIndex(0);
+        txtWebsite.setText("");
 
         txtSearch.setText("");
 
         table.clearSelection();
 
-        txtMemberCode.requestFocus();
+        txtPublisherName.requestFocus();
 
     }
 
@@ -1253,7 +965,7 @@ public class MemberManagementFrame extends JFrame {
             } catch (Exception ignored) {
             }
 
-            new MemberManagementFrame();
+            new PublisherManagementFrame();
 
         });
 
